@@ -44,7 +44,25 @@ const categoryCards = document.querySelectorAll(".category-card");
 categoryCards.forEach(function (card) {
     card.addEventListener("click", function () {
         const category = card.dataset.category;
-        alert(`Opening ${category} collection...`);
+        const products = document.querySelectorAll(".product-card");
+
+        products.forEach(function (product) {
+            const productText = product.textContent.toLowerCase();
+
+            if (category === "Men") {
+                product.style.display = productText.includes("men") ? "" : "none";
+            } else if (category === "Women") {
+                product.style.display = productText.includes("women") ? "" : "none";
+            } else if (category === "Kids") {
+                product.style.display = productText.includes("kids") ? "" : "none";
+            } else if (category === "Beauty") {
+                product.style.display = productText.includes("beauty") ? "" : "none";
+            }
+        });
+
+        document.getElementById("trending").scrollIntoView({
+            behavior: "smooth"
+        });
     });
 });
 
@@ -52,7 +70,9 @@ const viewCategoriesBtn = document.getElementById("viewCategoriesBtn");
 
 if (viewCategoriesBtn) {
     viewCategoriesBtn.addEventListener("click", function () {
-        alert("More categories will be available soon!");
+        document.querySelector(".categories-section").scrollIntoView({
+            behavior: "smooth"
+        });
     });
 }
 
@@ -60,7 +80,9 @@ const viewTrendingBtn = document.getElementById("viewTrendingBtn");
 
 if (viewTrendingBtn) {
     viewTrendingBtn.addEventListener("click", function () {
-        alert("Showing all trending products...");
+        document.getElementById("trending").scrollIntoView({
+            behavior: "smooth"
+        });
     });
 }
 
@@ -68,7 +90,9 @@ const featuredViewAll = document.getElementById("featuredViewAll");
 
 if (featuredViewAll) {
     featuredViewAll.addEventListener("click", function () {
-        alert("Showing all featured products...");
+        document.getElementById("featured").scrollIntoView({
+            behavior: "smooth"
+        });
     });
 }
 
@@ -129,7 +153,13 @@ const wishlistBtn = document.getElementById("wishlistBtn");
 
 if (wishlistBtn) {
     wishlistBtn.addEventListener("click", function () {
-        alert("Your wishlist will appear here.");
+        const wishlistItems = document.querySelectorAll(".product-heart.active").length;
+
+        if (wishlistItems === 0) {
+            alert("Your wishlist is empty.");
+        } else {
+            alert(`You have ${wishlistItems} item(s) in your wishlist.`);
+        }
     });
 }
 
