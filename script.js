@@ -1,151 +1,119 @@
-const productGrid = document.getElementById("productGrid");
 const searchInput = document.getElementById("searchInput");
-const bagCount = document.getElementById("bagCount");
-const wishlistCount = document.getElementById("wishlistCount");
-const toast = document.getElementById("toast");
+const clearSearch = document.getElementById("clearSearch");
+const productGrid = document.getElementById("productGrid");
+const emptyState = document.getElementById("emptyState");
+const productCards = [...document.querySelectorAll(".product-card")];
+const filterButtons = [...document.querySelectorAll(".filter-btn")];
+const categoryCards = [...document.querySelectorAll(".category-card")];
 
-let bagItems = 0;
-let wishlistItems = 0;
-let cartItems = [];
-let currentProduct = null;
+let bagCount = Number(localStorage.getItem("myntraBagCount") || 0);
+let wishlistCount = Number(localStorage.getItem("myntraWishlistCount") || 0);
+let selectedProduct = null;
 let modalQuantity = 1;
 
+const bagCountEl = document.getElementById("bagCount");
+const wishlistCountEl = document.getElementById("wishlistCount");
+
+function updateCounters() {
+    bagCountEl.textContent = bagCount;
+    wishlistCountEl.textContent = wishlistCount;
+    localStorage.setItem("myntraBagCount", bagCount);
+    localStorage.setItem("myntraWishlistCount", wishlistCount);
+}
+
 function showToast(message) {
-    toast.textContent = message;
+    const toast = document.getElementById("toast");
+    const text = toast.querySelector("span");
+    text.textContent = message;
     toast.classList.add("show");
 
-    setTimeout(() => {
+    clearTimeout(window.toastTimer);
+
+    window.toastTimer = setTimeout(() => {
         toast.classList.remove("show");
     }, 2200);
 }
 
-function updateBagCount() {
-    bagItems = cartItems.reduce((total, item) => total + item.quantity, 0);
-    bagCount.textContent = bagItems;
-}
+function filterProducts(category = "all", searchTerm = "") {
+    let visible = 0;
 
-function updateWishlist() {
-    wishlistCount.textContent = wishlistItems;
-}
+    productCards.forEach(card => {
+        const cardCategory = card.dataset.category;
+        const cardName = card.dataset.name.toLowerCase();
+        const matchesCategory = category === "all" || cardCategory === category;
+        const matchesSearch = cardName.includes(searchTerm.toLowerCase());
 
-function getProductData(card, size, quantity) {
-    return {
-        id: card.dataset.name,
-        brand: card.querySelector("h3").textContent,
-        name: card.querySelector(".product-name").textContent,
-        image: card.querySelector("img").src,
-        price: card.querySelector(".price").textContent.split("₹")[1].split(" ")[0],
-        size: size,
-        quantity: quantity
-    };
-}
-
-function renderCart() {
-    const cartItemsContainer = document.getElementById("cartItems");
-    const cartTotal = document.getElementById("cartTotal");
-
-    if (cartItems.length === 0) {
-        cartItemsContainer.innerHTML = `
-            <div class="empty-cart">
-                <i class="fa-solid fa-bag-shopping"></i>
-                <h3>Your bag is empty</h3>
-                <p>Add something you love!</p>
-            </div>
-        `;
-
-        cartTotal.textContent = "₹0";
-        return;
-    }
-
-    let total = 0;
-
-    cartItemsContainer.innerHTML = cartItems.map((item, index) => {
-        const price = Number(item.price.replace(/,/g, ""));
-        total += price * item.quantity;
-
-        return `
-            <div class="cart-item">
-                <div class="cart-item-image">
-                    <img src="${item.image}" alt="${item.name}">
-                </div>
-
-                <div class="cart-item-info">
-                    <h3>${item.brand}</h3>
-                    <p>${item.name}</p>
-                    <p>Size: ${item.size}</p>
-                    <div class="cart-item-price">₹${price.toLocaleString("en-IN")}</div>
-
-                    <div class="cart-item-controls">
-                        <button class="cart-minus" data-index="${index}">−</button>
-                        <span>${item.quantity}</span>
-                        <button class="cart-plus" data-index="${index}">+</button>
-                        <button class="remove-cart-item" data-index="${index}">
-                            <i class="fa-regular fa-trash-can"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join("");
-
-    cartTotal.textContent = "₹" + total.toLocaleString("en-IN");
-
-    document.querySelectorAll(".cart-minus").forEach(button => {
-        button.addEventListener("click", () => {
-            const index = Number(button.dataset.index);
-
-            if (cartItems[index].quantity > 1) {
-                cartItems[index].quantity--;
-            } else {
-                cartItems.splice(index, 1);
-            }
-
-            updateBagCount();
-            renderCart();
-        });
+        if (matchesCategory && matchesSearch) {
+            card.style.display = "";
+            visible++;
+        } else {
+            card.style.display = "none";
+        }
     });
 
-    document.querySelectorAll(".cart-plus").forEach(button => {
-        button.addEventListener("click", () => {
-            const index = Number(button.dataset.index);
+    emptyState.classList.toggle("show", visible === 0);
+}
 
-            if (cartItems[index].quantity < 10) {
-                cartItems[index].quantity++;
-            }
-
-            updateBagCount();
-            renderCart();
-        });
+function setActiveFilter(category) {
+    filterButtons.forEach(button => {
+        button.classList.toggle("active", button.dataset.filter === category);
     });
 
-    document.querySelectorAll(".remove-cart-item").forEach(button => {
-        button.addEventListener("click", () => {
-            const index = Number(button.dataset.index);
-
-            cartItems.splice(index, 1);
-            updateBagCount();
-            renderCart();
-            showToast("Item removed from bag");
-        });
+    categoryCards.forEach(card => {
+        card.classList.toggle("active", card.dataset.category === category);
     });
 }
 
-function openCart() {
-    document.getElementById("cartDrawer").classList.add("show");
-    document.getElementById("cartOverlay").classList.add("show");
-    renderCart();
-}
-
-function closeCart() {
-    document.getElementById("cartDrawer").classList.remove("show");
-    document.getElementById("cartOverlay").classList.remove("show");
-}
-
-document.querySelectorAll(".size-btn").forEach(button => {
+filterButtons.forEach(button => {
     button.addEventListener("click", () => {
-        const parent = button.closest(".size-row");
+        const category = button.dataset.filter;
+        setActiveFilter(category);
+        filterProducts(category, searchInput.value.trim());
 
-        parent.querySelectorAll(".size-btn").forEach(item => {
+        document.getElementById("products").scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    });
+});
+
+categoryCards.forEach(card => {
+    card.addEventListener("click", () => {
+        const category = card.dataset.category;
+
+        setActiveFilter(category);
+        filterProducts(category, searchInput.value.trim());
+
+        document.getElementById("products").scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    });
+});
+
+searchInput.addEventListener("input", () => {
+    clearSearch.style.display = searchInput.value ? "block" : "none";
+    filterProducts(
+        document.querySelector(".filter-btn.active")?.dataset.filter || "all",
+        searchInput.value.trim()
+    );
+});
+
+clearSearch.addEventListener("click", () => {
+    searchInput.value = "";
+    clearSearch.style.display = "none";
+    filterProducts(
+        document.querySelector(".filter-btn.active")?.dataset.filter || "all",
+        ""
+    );
+    searchInput.focus();
+});
+
+document.querySelectorAll(".sizes button").forEach(button => {
+    button.addEventListener("click", () => {
+        const parent = button.closest(".sizes");
+
+        parent.querySelectorAll("button").forEach(item => {
             item.classList.remove("selected");
         });
 
@@ -153,28 +121,42 @@ document.querySelectorAll(".size-btn").forEach(button => {
     });
 });
 
-document.querySelectorAll(".qty-plus").forEach(button => {
+document.querySelectorAll(".wishlist-toggle").forEach(button => {
     button.addEventListener("click", () => {
-        const row = button.closest(".quantity-row");
-        const quantity = row.querySelector(".quantity");
-        let value = Number(quantity.textContent);
+        button.classList.toggle("active");
 
-        if (value < 10) {
-            value++;
-            quantity.textContent = value;
+        if (button.classList.contains("active")) {
+            wishlistCount++;
+            showToast("Added to wishlist");
+        } else {
+            wishlistCount = Math.max(0, wishlistCount - 1);
+            showToast("Removed from wishlist");
         }
+
+        updateCounters();
     });
 });
 
 document.querySelectorAll(".qty-minus").forEach(button => {
     button.addEventListener("click", () => {
-        const row = button.closest(".quantity-row");
-        const quantity = row.querySelector(".quantity");
-        let value = Number(quantity.textContent);
+        const value = button.parentElement.querySelector(".qty-value");
+        let quantity = Number(value.textContent);
 
-        if (value > 1) {
-            value--;
-            quantity.textContent = value;
+        if (quantity > 1) {
+            quantity--;
+            value.textContent = quantity;
+        }
+    });
+});
+
+document.querySelectorAll(".qty-plus").forEach(button => {
+    button.addEventListener("click", () => {
+        const value = button.parentElement.querySelector(".qty-value");
+        let quantity = Number(value.textContent);
+
+        if (quantity < 10) {
+            quantity++;
+            value.textContent = quantity;
         }
     });
 });
@@ -182,113 +164,163 @@ document.querySelectorAll(".qty-minus").forEach(button => {
 document.querySelectorAll(".add-bag").forEach(button => {
     button.addEventListener("click", () => {
         const card = button.closest(".product-card");
-        const selectedSize = card.querySelector(".size-btn.selected");
-        const quantity = Number(card.querySelector(".quantity").textContent);
+        const selectedSize = card.querySelector(".sizes button.selected");
+        const quantity = Number(card.querySelector(".qty-value").textContent);
 
         if (!selectedSize) {
-            showToast("Please select a size");
+            showToast("Please select a size first");
             return;
         }
 
-        const product = getProductData(card, selectedSize.textContent, quantity);
+        bagCount += quantity;
+        updateCounters();
 
-        const existingItem = cartItems.find(item =>
-            item.id === product.id && item.size === product.size
-        );
+        button.innerHTML = '<i class="fa-solid fa-check"></i> Added';
 
-        if (existingItem) {
-            existingItem.quantity = Math.min(
-                existingItem.quantity + quantity,
-                10
-            );
-        } else {
-            cartItems.push(product);
-        }
+        setTimeout(() => {
+            button.innerHTML = 'Add to Bag <i class="fa-solid fa-bag-shopping"></i>';
+        }, 1200);
 
-        updateBagCount();
-        renderCart();
-        showToast(quantity + " item added to bag");
+        showToast(`${quantity} item${quantity > 1 ? "s" : ""} added to bag`);
     });
 });
 
-document.querySelectorAll(".wishlist-btn").forEach(button => {
-    button.addEventListener("click", () => {
-        button.classList.toggle("active");
+const modal = document.getElementById("quickViewModal");
+const modalClose = document.getElementById("modalClose");
+const modalImage = document.getElementById("modalImage");
+const modalBrand = document.getElementById("modalBrand");
+const modalName = document.getElementById("modalName");
+const modalRating = document.getElementById("modalRating");
+const modalDescription = document.getElementById("modalDescription");
+const modalPrice = document.getElementById("modalPrice");
+const modalOldPrice = document.getElementById("modalOldPrice");
+const modalDiscount = document.getElementById("modalDiscount");
+const modalSizes = document.getElementById("modalSizes");
+const modalQty = document.getElementById("modalQty");
 
-        const icon = button.querySelector("i");
+function openQuickView(card) {
+    selectedProduct = card;
+    modalQuantity = 1;
 
-        if (button.classList.contains("active")) {
-            icon.classList.remove("fa-regular");
-            icon.classList.add("fa-solid");
-            wishlistItems++;
-            showToast("Added to wishlist");
-        } else {
-            icon.classList.remove("fa-solid");
-            icon.classList.add("fa-regular");
-            wishlistItems--;
-            showToast("Removed from wishlist");
-        }
+    const image = card.querySelector(".product-image-wrap img");
+    const brand = card.querySelector(".product-brand");
+    const name = card.querySelector("h3");
+    const rating = card.querySelector(".rating");
+    const description = card.querySelector(".product-details > p");
+    const price = card.querySelector(".price-row strong");
+    const oldPrice = card.querySelector(".price-row del");
+    const discount = card.querySelector(".price-row span");
+    const sizes = card.querySelectorAll(".sizes button");
 
-        updateWishlist();
-    });
-});
+    modalImage.src = image.src;
+    modalImage.alt = image.alt;
+    modalBrand.textContent = brand.textContent;
+    modalName.textContent = name.textContent;
+    modalRating.textContent = rating.textContent;
+    modalDescription.textContent = description.textContent;
+    modalPrice.textContent = price.textContent;
+    modalOldPrice.textContent = oldPrice.textContent;
+    modalDiscount.textContent = discount.textContent;
+    modalQty.textContent = modalQuantity;
 
-searchInput.addEventListener("input", () => {
-    const search = searchInput.value.toLowerCase().trim();
+    modalSizes.innerHTML = "";
 
-    document.querySelectorAll(".product-card").forEach(card => {
-        const name = card.dataset.name.toLowerCase();
-        const category = card.dataset.category.toLowerCase();
+    sizes.forEach(size => {
+        const button = document.createElement("button");
+        button.textContent = size.textContent;
 
-        card.style.display =
-            name.includes(search) || category.includes(search)
-                ? ""
-                : "none";
-    });
-});
+        button.addEventListener("click", () => {
+            modalSizes.querySelectorAll("button").forEach(item => {
+                item.classList.remove("selected");
+            });
 
-document.querySelectorAll(".category-card").forEach(button => {
-    button.addEventListener("click", () => {
-        const category = button.dataset.category;
-
-        document.querySelectorAll(".product-card").forEach(card => {
-            card.style.display =
-                card.dataset.category === category
-                    ? ""
-                    : "none";
+            button.classList.add("selected");
         });
 
-        document.getElementById("trending").scrollIntoView({
-            behavior: "smooth"
-        });
+        modalSizes.appendChild(button);
+    });
 
-        showToast(category + " products");
+    modal.classList.add("show");
+    document.body.style.overflow = "hidden";
+}
+
+document.querySelectorAll(".quick-view").forEach(button => {
+    button.addEventListener("click", () => {
+        openQuickView(button.closest(".product-card"));
     });
 });
 
-document.getElementById("viewAllBtn").addEventListener("click", () => {
-    document.querySelectorAll(".product-card").forEach(card => {
-        card.style.display = "";
-    });
+modalClose.addEventListener("click", closeModal);
 
-    searchInput.value = "";
-    showToast("Showing all products");
+modal.addEventListener("click", event => {
+    if (event.target === modal) {
+        closeModal();
+    }
+});
+
+function closeModal() {
+    modal.classList.remove("show");
+    document.body.style.overflow = "";
+}
+
+document.getElementById("modalMinus").addEventListener("click", () => {
+    if (modalQuantity > 1) {
+        modalQuantity--;
+        modalQty.textContent = modalQuantity;
+    }
+});
+
+document.getElementById("modalPlus").addEventListener("click", () => {
+    if (modalQuantity < 10) {
+        modalQuantity++;
+        modalQty.textContent = modalQuantity;
+    }
+});
+
+document.getElementById("modalAdd").addEventListener("click", () => {
+    const selectedSize = modalSizes.querySelector(".selected");
+
+    if (!selectedSize) {
+        showToast("Please select a size first");
+        return;
+    }
+
+    bagCount += modalQuantity;
+    updateCounters();
+
+    closeModal();
+    showToast(`${modalQuantity} item${modalQuantity > 1 ? "s" : ""} added to bag`);
 });
 
 document.getElementById("shopNowBtn").addEventListener("click", () => {
+    document.getElementById("products").scrollIntoView({
+        behavior: "smooth"
+    });
+});
+
+document.getElementById("exploreBtn").addEventListener("click", () => {
     document.getElementById("trending").scrollIntoView({
         behavior: "smooth"
     });
 });
 
-document.getElementById("featuredBtn").addEventListener("click", () => {
-    document.getElementById("trending").scrollIntoView({
+document.getElementById("editorialBtn").addEventListener("click", () => {
+    document.getElementById("products").scrollIntoView({
         behavior: "smooth"
     });
 });
 
 document.getElementById("offerBtn").addEventListener("click", () => {
-    document.getElementById("trending").scrollIntoView({
+    showToast("Exclusive offers unlocked");
+    document.getElementById("products").scrollIntoView({
+        behavior: "smooth"
+    });
+});
+
+document.getElementById("viewAllCategories").addEventListener("click", () => {
+    setActiveFilter("all");
+    filterProducts("all", "");
+    document.getElementById("products").scrollIntoView({
         behavior: "smooth"
     });
 });
@@ -298,133 +330,92 @@ document.getElementById("profileBtn").addEventListener("click", () => {
 });
 
 document.getElementById("wishlistBtn").addEventListener("click", () => {
-    showToast("Wishlist: " + wishlistItems + " item(s)");
+    showToast(`${wishlistCount} item${wishlistCount === 1 ? "" : "s"} in wishlist`);
 });
 
-document.getElementById("bagBtn").addEventListener("click", openCart);
-
-document.getElementById("closeCart").addEventListener("click", closeCart);
-
-document.getElementById("cartOverlay").addEventListener("click", closeCart);
-
-document.getElementById("checkoutBtn").addEventListener("click", () => {
-    if (cartItems.length === 0) {
-        showToast("Your bag is empty");
-        return;
-    }
-
-    showToast("Order process started");
+document.getElementById("bagBtn").addEventListener("click", () => {
+    showToast(`${bagCount} item${bagCount === 1 ? "" : "s"} in your bag`);
 });
 
-const modal = document.getElementById("quickViewModal");
-const closeModal = document.getElementById("closeModal");
-const modalImage = document.getElementById("modalImage");
-const modalBrand = document.getElementById("modalBrand");
-const modalName = document.getElementById("modalName");
-const modalDescription = document.getElementById("modalDescription");
-const modalRating = document.getElementById("modalRating");
-const modalPrice = document.getElementById("modalPrice");
-const modalQuantityElement = document.getElementById("modalQuantity");
-
-document.querySelectorAll(".quick-view").forEach(button => {
-    button.addEventListener("click", () => {
-        currentProduct = button.closest(".product-card");
-
-        modalImage.src = currentProduct.querySelector("img").src;
-        modalBrand.textContent = currentProduct.querySelector("h3").textContent;
-        modalName.textContent = currentProduct.querySelector(".product-name").textContent;
-        modalDescription.textContent = "Premium fashion product designed for everyday style and comfort.";
-        modalRating.textContent = currentProduct.querySelector(".rating").textContent;
-        modalPrice.textContent = currentProduct.querySelector(".price").textContent;
-
-        modalQuantity = 1;
-        modalQuantityElement.textContent = "1";
-
-        document.querySelectorAll(".modal-size").forEach(button => {
-            button.classList.remove("selected");
-        });
-
-        modal.classList.add("show");
-    });
+document.getElementById("mobileWishlist").addEventListener("click", () => {
+    showToast(`${wishlistCount} item${wishlistCount === 1 ? "" : "s"} in wishlist`);
 });
 
-document.querySelectorAll(".modal-size").forEach(button => {
-    button.addEventListener("click", () => {
-        document.querySelectorAll(".modal-size").forEach(item => {
-            item.classList.remove("selected");
-        });
-
-        button.classList.add("selected");
-    });
+document.getElementById("mobileBag").addEventListener("click", () => {
+    showToast(`${bagCount} item${bagCount === 1 ? "" : "s"} in your bag`);
 });
 
-document.getElementById("modalPlus").addEventListener("click", () => {
-    if (modalQuantity < 10) {
-        modalQuantity++;
-        modalQuantityElement.textContent = modalQuantity;
-    }
-});
+const mobileMenu = document.getElementById("mobileMenu");
+const mobileNav = document.getElementById("mobileNav");
 
-document.getElementById("modalMinus").addEventListener("click", () => {
-    if (modalQuantity > 1) {
-        modalQuantity--;
-        modalQuantityElement.textContent = modalQuantity;
-    }
-});
+mobileMenu.addEventListener("click", () => {
+    mobileNav.classList.toggle("show");
 
-document.getElementById("modalAddBag").addEventListener("click", () => {
-    const selectedSize = document.querySelector(".modal-size.selected");
+    const icon = mobileMenu.querySelector("i");
 
-    if (!selectedSize) {
-        showToast("Please select a size");
-        return;
-    }
-
-    const priceText = currentProduct.querySelector(".price").textContent;
-    const price = priceText.split("₹")[1].split(" ")[0];
-
-    const product = {
-        id: currentProduct.dataset.name,
-        brand: currentProduct.querySelector("h3").textContent,
-        name: currentProduct.querySelector(".product-name").textContent,
-        image: currentProduct.querySelector("img").src,
-        price: price,
-        size: selectedSize.textContent,
-        quantity: modalQuantity
-    };
-
-    const existingItem = cartItems.find(item =>
-        item.id === product.id && item.size === product.size
-    );
-
-    if (existingItem) {
-        existingItem.quantity = Math.min(
-            existingItem.quantity + product.quantity,
-            10
-        );
+    if (mobileNav.classList.contains("show")) {
+        icon.className = "fa-solid fa-xmark";
     } else {
-        cartItems.push(product);
+        icon.className = "fa-solid fa-bars";
     }
-
-    updateBagCount();
-    renderCart();
-    modal.classList.remove("show");
-    showToast(product.quantity + " item added to bag");
 });
 
-closeModal.addEventListener("click", () => {
-    modal.classList.remove("show");
+mobileNav.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => {
+        mobileNav.classList.remove("show");
+        mobileMenu.querySelector("i").className = "fa-solid fa-bars";
+    });
 });
 
-modal.addEventListener("click", event => {
-    if (event.target === modal) {
-        modal.classList.remove("show");
+document.querySelectorAll(".occasion-card").forEach(card => {
+    card.addEventListener("click", () => {
+        document.getElementById("products").scrollIntoView({
+            behavior: "smooth"
+        });
+
+        showToast("Showing styles for this occasion");
+    });
+});
+
+const revealElements = document.querySelectorAll(
+    ".category-card, .product-card, .editorial, .occasion-card, .offer-section, .trust-strip > div"
+);
+
+revealElements.forEach(element => {
+    element.style.opacity = "0";
+    element.style.transform = "translateY(25px)";
+    element.style.transition = "opacity 0.7s ease, transform 0.7s ease";
+});
+
+const revealObserver = new IntersectionObserver(
+    entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = "1";
+                entry.target.style.transform = "translateY(0)";
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    },
+    {
+        threshold: 0.1
     }
+);
+
+revealElements.forEach(element => {
+    revealObserver.observe(element);
 });
 
 document.addEventListener("keydown", event => {
     if (event.key === "Escape") {
-        modal.classList.remove("show");
-        closeCart();
+        closeModal();
+
+        if (mobileNav.classList.contains("show")) {
+            mobileNav.classList.remove("show");
+            mobileMenu.querySelector("i").className = "fa-solid fa-bars";
+        }
     }
 });
+
+updateCounters();
+filterProducts("all", "");

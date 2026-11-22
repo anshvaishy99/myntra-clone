@@ -3,436 +3,722 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Myntra Clone</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Myntra — Fashion That Moves With You</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header class="navbar">
-    <div class="logo">MYNTRA</div>
+<div class="announcement">
+    <div class="announcement-track">
+        <span>✨ TRENDING NOW — NEW SEASON DROP</span>
+        <span>FREE SHIPPING ON ORDERS ABOVE ₹999</span>
+        <span>EXTRA 10% OFF ON FIRST ORDER</span>
+        <span>✨ TRENDING NOW — NEW SEASON DROP</span>
+    </div>
+</div>
 
-    <nav>
-        <a href="#home">MEN</a>
-        <a href="#home">WOMEN</a>
-        <a href="#home">KIDS</a>
-        <a href="#home">BEAUTY</a>
+<header class="navbar">
+    <a href="#home" class="brand">
+        <span class="brand-mark">M</span>
+        <span class="brand-text">MYNTRA</span>
+    </a>
+
+    <nav class="main-nav">
+        <a href="#products">MEN</a>
+        <a href="#products">WOMEN</a>
+        <a href="#products">KIDS</a>
+        <a href="#products">BEAUTY</a>
         <a href="#trending">TRENDING</a>
     </nav>
 
-    <div class="search-box">
+    <div class="nav-search">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" id="searchInput" placeholder="Search for products, brands and more">
+        <button id="clearSearch"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
     <div class="nav-actions">
-        <button id="profileBtn">
+        <button class="nav-action" id="profileBtn">
             <i class="fa-regular fa-user"></i>
             <span>Profile</span>
         </button>
-
-        <button id="wishlistBtn">
+        <button class="nav-action" id="wishlistBtn">
+            <span class="counter" id="wishlistCount">0</span>
             <i class="fa-regular fa-heart"></i>
             <span>Wishlist</span>
-            <b id="wishlistCount">0</b>
         </button>
-
-        <button id="bagBtn">
+        <button class="nav-action bag-action" id="bagBtn">
+            <span class="counter" id="bagCount">0</span>
             <i class="fa-solid fa-bag-shopping"></i>
             <span>Bag</span>
-            <b id="bagCount">0</b>
         </button>
     </div>
+
+    <button class="mobile-menu" id="mobileMenu">
+        <i class="fa-solid fa-bars"></i>
+    </button>
 </header>
 
-<main>
+<div class="mobile-nav" id="mobileNav">
+    <a href="#products">MEN</a>
+    <a href="#products">WOMEN</a>
+    <a href="#products">KIDS</a>
+    <a href="#products">BEAUTY</a>
+    <a href="#trending">TRENDING</a>
+</div>
 
-<section class="hero" id="home">
-    <div class="hero-content">
-        <span>NEW SEASON</span>
-        <h1>Fashion That<br>Defines You</h1>
-        <p>Discover the latest trends in fashion, beauty and lifestyle.</p>
-        <button id="shopNowBtn">SHOP NOW <i class="fa-solid fa-arrow-right"></i></button>
-    </div>
-</section>
+<main id="home">
 
-<section class="categories">
-    <div class="section-title">
-        <div>
-            <span>EXPLORE</span>
-            <h2>Shop By Category</h2>
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-tag">
+                <span></span>
+                THE NEW FASHION EDIT
+            </div>
+
+            <h1>
+                Dress Like<br>
+                <em>You Mean It.</em>
+            </h1>
+
+            <p>
+                Discover elevated everyday styles, statement pieces
+                and fresh looks made for every version of you.
+            </p>
+
+            <div class="hero-buttons">
+                <button class="primary-btn" id="shopNowBtn">
+                    Shop New Arrivals
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <button class="ghost-btn" id="exploreBtn">
+                    Explore Collection
+                </button>
+            </div>
+
+            <div class="hero-stats">
+                <div>
+                    <strong>10K+</strong>
+                    <span>Styles</span>
+                </div>
+                <div>
+                    <strong>2K+</strong>
+                    <span>Brands</span>
+                </div>
+                <div>
+                    <strong>4.8★</strong>
+                    <span>Customer Love</span>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="category-grid">
-        <button class="category-card" data-category="Men">
-            <div class="category-icon">👔</div>
-            <h3>Men</h3>
-            <p>Explore Men's Fashion</p>
-        </button>
+        <div class="hero-visual">
+            <div class="hero-glow"></div>
+            <div class="hero-card hero-card-main">
+                <img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=1200&q=85" alt="Fashion model">
+            </div>
+            <div class="floating-card card-one">
+                <span>NEW DROP</span>
+                <strong>90s Revival</strong>
+                <small>Trending now</small>
+            </div>
+            <div class="floating-card card-two">
+                <i class="fa-solid fa-bolt"></i>
+                <div>
+                    <strong>Up to 60% OFF</strong>
+                    <small>Selected styles</small>
+                </div>
+            </div>
+            <div class="hero-number">01</div>
+        </div>
+    </section>
 
-        <button class="category-card" data-category="Women">
-            <div class="category-icon">👗</div>
-            <h3>Women</h3>
-            <p>Explore Women's Fashion</p>
-        </button>
-
-        <button class="category-card" data-category="Kids">
-            <div class="category-icon">🧸</div>
-            <h3>Kids</h3>
-            <p>Fun Fashion For Kids</p>
-        </button>
-
-        <button class="category-card" data-category="Beauty">
-            <div class="category-icon">💄</div>
-            <h3>Beauty</h3>
-            <p>Beauty & Personal Care</p>
-        </button>
-    </div>
-</section>
-
-<section class="products" id="trending">
-    <div class="section-title">
+    <section class="trust-strip">
         <div>
-            <span>TRENDING NOW</span>
-            <h2>Featured Products</h2>
+            <i class="fa-solid fa-truck-fast"></i>
+            <div>
+                <strong>Fast Delivery</strong>
+                <span>Across India</span>
+            </div>
+        </div>
+        <div>
+            <i class="fa-solid fa-shield-heart"></i>
+            <div>
+                <strong>100% Original</strong>
+                <span>Authentic products</span>
+            </div>
+        </div>
+        <div>
+            <i class="fa-solid fa-rotate-left"></i>
+            <div>
+                <strong>Easy Returns</strong>
+                <span>Hassle-free shopping</span>
+            </div>
+        </div>
+        <div>
+            <i class="fa-solid fa-wallet"></i>
+            <div>
+                <strong>Secure Payments</strong>
+                <span>Safe & protected</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="category-section" id="trending">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">EXPLORE THE EDIT</span>
+                <h2>Shop By <em>Vibe</em></h2>
+            </div>
+            <button class="text-btn" id="viewAllCategories">
+                View all <i class="fa-solid fa-arrow-right"></i>
+            </button>
         </div>
 
-        <button id="viewAllBtn">View All <i class="fa-solid fa-arrow-right"></i></button>
-    </div>
+        <div class="category-grid">
+            <button class="category-card active" data-category="all">
+                <div class="category-image">
+                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=700&q=85" alt="All fashion">
+                </div>
+                <div class="category-info">
+                    <span>01</span>
+                    <strong>Everything</strong>
+                    <small>Explore all styles</small>
+                </div>
+            </button>
 
-    <div class="product-grid" id="productGrid">
+            <button class="category-card" data-category="men">
+                <div class="category-image">
+                    <img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=700&q=85" alt="Men fashion">
+                </div>
+                <div class="category-info">
+                    <span>02</span>
+                    <strong>Men</strong>
+                    <small>Modern essentials</small>
+                </div>
+            </button>
 
-        <article class="product-card" data-category="Men" data-name="Roadster Casual Shirt">
-            <div class="product-image">
-                <img src="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=700&q=80" alt="Roadster Casual Shirt">
-                <button class="wishlist-btn"><i class="fa-regular fa-heart"></i></button>
-                <span class="badge">NEW</span>
+            <button class="category-card" data-category="women">
+                <div class="category-image">
+                    <img src="https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=700&q=85" alt="Women fashion">
+                </div>
+                <div class="category-info">
+                    <span>03</span>
+                    <strong>Women</strong>
+                    <small>Elevated looks</small>
+                </div>
+            </button>
+
+            <button class="category-card" data-category="kids">
+                <div class="category-image">
+                    <img src="https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=700&q=85" alt="Kids fashion">
+                </div>
+                <div class="category-info">
+                    <span>04</span>
+                    <strong>Kids</strong>
+                    <small>Playful & cool</small>
+                </div>
+            </button>
+
+            <button class="category-card" data-category="beauty">
+                <div class="category-image">
+                    <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=700&q=85" alt="Beauty">
+                </div>
+                <div class="category-info">
+                    <span>05</span>
+                    <strong>Beauty</strong>
+                    <small>Glow your way</small>
+                </div>
+            </button>
+        </div>
+    </section>
+
+    <section class="products-section" id="products">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">CURATED FOR YOU</span>
+                <h2>Trending <em>Now</em></h2>
             </div>
-
-            <div class="product-info">
-                <h3>Roadster</h3>
-                <p class="product-name">Casual Cotton Shirt</p>
-                <div class="rating">4.5 <i class="fa-solid fa-star"></i> <span>1.2k</span></div>
-                <div class="price">₹799 <del>₹1,599</del> <strong>50% OFF</strong></div>
-
-                <div class="size-row">
-                    <button class="size-btn">S</button>
-                    <button class="size-btn">M</button>
-                    <button class="size-btn">L</button>
-                    <button class="size-btn">XL</button>
-                </div>
-
-                <div class="quantity-row">
-                    <button class="qty-minus">−</button>
-                    <span class="quantity">1</span>
-                    <button class="qty-plus">+</button>
-                </div>
-
-                <div class="product-buttons">
-                    <button class="quick-view">Quick View</button>
-                    <button class="add-bag">Add to Bag</button>
-                </div>
+            <div class="product-controls">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="men">Men</button>
+                <button class="filter-btn" data-filter="women">Women</button>
+                <button class="filter-btn" data-filter="kids">Kids</button>
+                <button class="filter-btn" data-filter="beauty">Beauty</button>
             </div>
-        </article>
+        </div>
 
-        <article class="product-card" data-category="Women" data-name="Roadster Women Dress">
-            <div class="product-image">
-                <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=700&q=80" alt="Women Dress">
-                <button class="wishlist-btn"><i class="fa-regular fa-heart"></i></button>
-                <span class="badge">TRENDING</span>
+        <div class="product-grid" id="productGrid">
+
+            <article class="product-card" data-category="women" data-name="Roadster Oversized Shirt">
+                <div class="product-image-wrap">
+                    <span class="product-badge">BESTSELLER</span>
+                    <button class="wishlist-toggle"><i class="fa-regular fa-heart"></i></button>
+                    <img src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=85" alt="Roadster Oversized Shirt">
+                    <div class="image-actions">
+                        <button class="quick-view">Quick View</button>
+                    </div>
+                </div>
+                <div class="product-details">
+                    <div class="product-brand">Roadster</div>
+                    <h3>Oversized Cotton Shirt</h3>
+                    <div class="rating">
+                        <span>4.5 ★</span>
+                        <small>1.2k ratings</small>
+                    </div>
+                    <p>Relaxed fit • Premium cotton</p>
+                    <div class="price-row">
+                        <strong>₹899</strong>
+                        <del>₹1,999</del>
+                        <span>55% OFF</span>
+                    </div>
+                    <div class="size-row">
+                        <span>Size</span>
+                        <div class="sizes">
+                            <button>S</button>
+                            <button>M</button>
+                            <button>L</button>
+                            <button>XL</button>
+                        </div>
+                    </div>
+                    <div class="product-bottom">
+                        <div class="quantity">
+                            <button class="qty-minus">−</button>
+                            <span class="qty-value">1</span>
+                            <button class="qty-plus">+</button>
+                        </div>
+                        <button class="add-bag">Add to Bag <i class="fa-solid fa-bag-shopping"></i></button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-category="men" data-name="H&M Relaxed Shirt">
+                <div class="product-image-wrap">
+                    <span class="product-badge new">NEW</span>
+                    <button class="wishlist-toggle"><i class="fa-regular fa-heart"></i></button>
+                    <img src="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=900&q=85" alt="H&M Relaxed Shirt">
+                    <div class="image-actions">
+                        <button class="quick-view">Quick View</button>
+                    </div>
+                </div>
+                <div class="product-details">
+                    <div class="product-brand">H&M</div>
+                    <h3>Relaxed Linen Shirt</h3>
+                    <div class="rating">
+                        <span>4.4 ★</span>
+                        <small>864 ratings</small>
+                    </div>
+                    <p>Regular fit • Linen blend</p>
+                    <div class="price-row">
+                        <strong>₹1,499</strong>
+                        <del>₹2,499</del>
+                        <span>40% OFF</span>
+                    </div>
+                    <div class="size-row">
+                        <span>Size</span>
+                        <div class="sizes">
+                            <button>S</button>
+                            <button>M</button>
+                            <button>L</button>
+                            <button>XL</button>
+                        </div>
+                    </div>
+                    <div class="product-bottom">
+                        <div class="quantity">
+                            <button class="qty-minus">−</button>
+                            <span class="qty-value">1</span>
+                            <button class="qty-plus">+</button>
+                        </div>
+                        <button class="add-bag">Add to Bag <i class="fa-solid fa-bag-shopping"></i></button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-category="women" data-name="Mango Floral Dress">
+                <div class="product-image-wrap">
+                    <span class="product-badge hot">HOT</span>
+                    <button class="wishlist-toggle"><i class="fa-regular fa-heart"></i></button>
+                    <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=900&q=85" alt="Mango Floral Dress">
+                    <div class="image-actions">
+                        <button class="quick-view">Quick View</button>
+                    </div>
+                </div>
+                <div class="product-details">
+                    <div class="product-brand">Mango</div>
+                    <h3>Floral Midi Dress</h3>
+                    <div class="rating">
+                        <span>4.7 ★</span>
+                        <small>2.1k ratings</small>
+                    </div>
+                    <p>Flared fit • Printed fabric</p>
+                    <div class="price-row">
+                        <strong>₹1,799</strong>
+                        <del>₹3,499</del>
+                        <span>49% OFF</span>
+                    </div>
+                    <div class="size-row">
+                        <span>Size</span>
+                        <div class="sizes">
+                            <button>S</button>
+                            <button>M</button>
+                            <button>L</button>
+                            <button>XL</button>
+                        </div>
+                    </div>
+                    <div class="product-bottom">
+                        <div class="quantity">
+                            <button class="qty-minus">−</button>
+                            <span class="qty-value">1</span>
+                            <button class="qty-plus">+</button>
+                        </div>
+                        <button class="add-bag">Add to Bag <i class="fa-solid fa-bag-shopping"></i></button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-category="men" data-name="Nike Running Shoes">
+                <div class="product-image-wrap">
+                    <span class="product-badge">TRENDING</span>
+                    <button class="wishlist-toggle"><i class="fa-regular fa-heart"></i></button>
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=85" alt="Nike Running Shoes">
+                    <div class="image-actions">
+                        <button class="quick-view">Quick View</button>
+                    </div>
+                </div>
+                <div class="product-details">
+                    <div class="product-brand">Nike</div>
+                    <h3>Air Max Running Shoes</h3>
+                    <div class="rating">
+                        <span>4.6 ★</span>
+                        <small>3.4k ratings</small>
+                    </div>
+                    <p>Lightweight • Everyday running</p>
+                    <div class="price-row">
+                        <strong>₹3,999</strong>
+                        <del>₹6,995</del>
+                        <span>43% OFF</span>
+                    </div>
+                    <div class="size-row">
+                        <span>Size</span>
+                        <div class="sizes">
+                            <button>7</button>
+                            <button>8</button>
+                            <button>9</button>
+                            <button>10</button>
+                        </div>
+                    </div>
+                    <div class="product-bottom">
+                        <div class="quantity">
+                            <button class="qty-minus">−</button>
+                            <span class="qty-value">1</span>
+                            <button class="qty-plus">+</button>
+                        </div>
+                        <button class="add-bag">Add to Bag <i class="fa-solid fa-bag-shopping"></i></button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-category="beauty" data-name="Maybelline Lipstick">
+                <div class="product-image-wrap">
+                    <span class="product-badge new">NEW</span>
+                    <button class="wishlist-toggle"><i class="fa-regular fa-heart"></i></button>
+                    <img src="https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=900&q=85" alt="Maybelline Lipstick">
+                    <div class="image-actions">
+                        <button class="quick-view">Quick View</button>
+                    </div>
+                </div>
+                <div class="product-details">
+                    <div class="product-brand">Maybelline</div>
+                    <h3>Super Stay Matte Lipstick</h3>
+                    <div class="rating">
+                        <span>4.8 ★</span>
+                        <small>5.8k ratings</small>
+                    </div>
+                    <p>Long lasting • Matte finish</p>
+                    <div class="price-row">
+                        <strong>₹599</strong>
+                        <del>₹799</del>
+                        <span>25% OFF</span>
+                    </div>
+                    <div class="size-row">
+                        <span>Shade</span>
+                        <div class="sizes">
+                            <button>01</button>
+                            <button>02</button>
+                            <button>03</button>
+                            <button>04</button>
+                        </div>
+                    </div>
+                    <div class="product-bottom">
+                        <div class="quantity">
+                            <button class="qty-minus">−</button>
+                            <span class="qty-value">1</span>
+                            <button class="qty-plus">+</button>
+                        </div>
+                        <button class="add-bag">Add to Bag <i class="fa-solid fa-bag-shopping"></i></button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-category="kids" data-name="H&M Kids Hoodie">
+                <div class="product-image-wrap">
+                    <span class="product-badge">POPULAR</span>
+                    <button class="wishlist-toggle"><i class="fa-regular fa-heart"></i></button>
+                    <img src="https://images.unsplash.com/photo-1519457431-44ccd64a579b?auto=format&fit=crop&w=900&q=85" alt="Kids Hoodie">
+                    <div class="image-actions">
+                        <button class="quick-view">Quick View</button>
+                    </div>
+                </div>
+                <div class="product-details">
+                    <div class="product-brand">H&M Kids</div>
+                    <h3>Graphic Oversized Hoodie</h3>
+                    <div class="rating">
+                        <span>4.5 ★</span>
+                        <small>921 ratings</small>
+                    </div>
+                    <p>Soft fleece • Relaxed fit</p>
+                    <div class="price-row">
+                        <strong>₹999</strong>
+                        <del>₹1,799</del>
+                        <span>44% OFF</span>
+                    </div>
+                    <div class="size-row">
+                        <span>Size</span>
+                        <div class="sizes">
+                            <button>4Y</button>
+                            <button>6Y</button>
+                            <button>8Y</button>
+                            <button>10Y</button>
+                        </div>
+                    </div>
+                    <div class="product-bottom">
+                        <div class="quantity">
+                            <button class="qty-minus">−</button>
+                            <span class="qty-value">1</span>
+                            <button class="qty-plus">+</button>
+                        </div>
+                        <button class="add-bag">Add to Bag <i class="fa-solid fa-bag-shopping"></i></button>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <h3>No styles found</h3>
+            <p>Try another search or category.</p>
+        </div>
+    </section>
+
+    <section class="editorial">
+        <div class="editorial-image">
+            <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1400&q=85" alt="Fashion editorial">
+        </div>
+        <div class="editorial-content">
+            <span class="eyebrow">THE STYLE REPORT</span>
+            <h2>Quiet Luxury.<br><em>Loud Impact.</em></h2>
+            <p>
+                Clean silhouettes, rich textures and timeless pieces.
+                Build a wardrobe that speaks before you do.
+            </p>
+            <button class="dark-btn" id="editorialBtn">
+                Shop The Edit
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <div class="editorial-number">02</div>
+        </div>
+    </section>
+
+    <section class="occasion-section">
+        <div class="section-heading centered">
+            <div>
+                <span class="eyebrow">STYLE FOR EVERY MOMENT</span>
+                <h2>Where Are You <em>Going?</em></h2>
             </div>
+        </div>
 
-            <div class="product-info">
-                <h3>Roadster</h3>
-                <p class="product-name">Women Floral Dress</p>
-                <div class="rating">4.4 <i class="fa-solid fa-star"></i> <span>856</span></div>
-                <div class="price">₹999 <del>₹1,999</del> <strong>50% OFF</strong></div>
-
-                <div class="size-row">
-                    <button class="size-btn">S</button>
-                    <button class="size-btn">M</button>
-                    <button class="size-btn">L</button>
-                    <button class="size-btn">XL</button>
+        <div class="occasion-grid">
+            <button class="occasion-card">
+                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1000&q=85" alt="Date night">
+                <div>
+                    <span>01</span>
+                    <strong>Date Night</strong>
+                    <small>Dress to be remembered</small>
                 </div>
+            </button>
 
-                <div class="quantity-row">
-                    <button class="qty-minus">−</button>
-                    <span class="quantity">1</span>
-                    <button class="qty-plus">+</button>
+            <button class="occasion-card">
+                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1000&q=85" alt="Weekend">
+                <div>
+                    <span>02</span>
+                    <strong>Weekend Mood</strong>
+                    <small>Easy looks, effortless energy</small>
                 </div>
+            </button>
 
-                <div class="product-buttons">
-                    <button class="quick-view">Quick View</button>
-                    <button class="add-bag">Add to Bag</button>
+            <button class="occasion-card">
+                <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1000&q=85" alt="Workwear">
+                <div>
+                    <span>03</span>
+                    <strong>Work Edit</strong>
+                    <small>Power dressing, redefined</small>
                 </div>
+            </button>
+        </div>
+    </section>
+
+    <section class="offer-section">
+        <div class="offer-copy">
+            <span class="eyebrow">LIMITED TIME ONLY</span>
+            <h2>More Style.<br><em>Less Spend.</em></h2>
+            <p>Unlock exclusive deals on your favourite fashion, beauty and lifestyle picks.</p>
+            <button class="primary-btn" id="offerBtn">
+                Explore Offers
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+        <div class="offer-visual">
+            <div class="offer-circle">
+                <span>UP TO</span>
+                <strong>60%</strong>
+                <small>OFF</small>
             </div>
-        </article>
-
-        <article class="product-card" data-category="Men" data-name="HRX Sports Shoes">
-            <div class="product-image">
-                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80" alt="Sports Shoes">
-                <button class="wishlist-btn"><i class="fa-regular fa-heart"></i></button>
-                <span class="badge">BESTSELLER</span>
-            </div>
-
-            <div class="product-info">
-                <h3>HRX</h3>
-                <p class="product-name">Men Running Shoes</p>
-                <div class="rating">4.6 <i class="fa-solid fa-star"></i> <span>2.1k</span></div>
-                <div class="price">₹1,499 <del>₹2,999</del> <strong>50% OFF</strong></div>
-
-                <div class="size-row">
-                    <button class="size-btn">S</button>
-                    <button class="size-btn">M</button>
-                    <button class="size-btn">L</button>
-                    <button class="size-btn">XL</button>
-                </div>
-
-                <div class="quantity-row">
-                    <button class="qty-minus">−</button>
-                    <span class="quantity">1</span>
-                    <button class="qty-plus">+</button>
-                </div>
-
-                <div class="product-buttons">
-                    <button class="quick-view">Quick View</button>
-                    <button class="add-bag">Add to Bag</button>
-                </div>
-            </div>
-        </article>
-
-        <article class="product-card" data-category="Women" data-name="Lavie Handbag">
-            <div class="product-image">
-                <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=700&q=80" alt="Handbag">
-                <button class="wishlist-btn"><i class="fa-regular fa-heart"></i></button>
-                <span class="badge">HOT</span>
-            </div>
-
-            <div class="product-info">
-                <h3>Lavie</h3>
-                <p class="product-name">Women Shoulder Bag</p>
-                <div class="rating">4.3 <i class="fa-solid fa-star"></i> <span>743</span></div>
-                <div class="price">₹1,199 <del>₹2,499</del> <strong>52% OFF</strong></div>
-
-                <div class="size-row">
-                    <button class="size-btn">S</button>
-                    <button class="size-btn">M</button>
-                    <button class="size-btn">L</button>
-                    <button class="size-btn">XL</button>
-                </div>
-
-                <div class="quantity-row">
-                    <button class="qty-minus">−</button>
-                    <span class="quantity">1</span>
-                    <button class="qty-plus">+</button>
-                </div>
-
-                <div class="product-buttons">
-                    <button class="quick-view">Quick View</button>
-                    <button class="add-bag">Add to Bag</button>
-                </div>
-            </div>
-        </article>
-
-        <article class="product-card" data-category="Kids" data-name="Kids Casual T Shirt">
-            <div class="product-image">
-                <img src="https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=700&q=80" alt="Kids Fashion">
-                <button class="wishlist-btn"><i class="fa-regular fa-heart"></i></button>
-                <span class="badge">NEW</span>
-            </div>
-
-            <div class="product-info">
-                <h3>H&M</h3>
-                <p class="product-name">Kids Casual T-Shirt</p>
-                <div class="rating">4.5 <i class="fa-solid fa-star"></i> <span>532</span></div>
-                <div class="price">₹599 <del>₹999</del> <strong>40% OFF</strong></div>
-
-                <div class="size-row">
-                    <button class="size-btn">S</button>
-                    <button class="size-btn">M</button>
-                    <button class="size-btn">L</button>
-                    <button class="size-btn">XL</button>
-                </div>
-
-                <div class="quantity-row">
-                    <button class="qty-minus">−</button>
-                    <span class="quantity">1</span>
-                    <button class="qty-plus">+</button>
-                </div>
-
-                <div class="product-buttons">
-                    <button class="quick-view">Quick View</button>
-                    <button class="add-bag">Add to Bag</button>
-                </div>
-            </div>
-        </article>
-
-        <article class="product-card" data-category="Beauty" data-name="Maybelline Makeup Kit">
-            <div class="product-image">
-                <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=700&q=80" alt="Beauty Products">
-                <button class="wishlist-btn"><i class="fa-regular fa-heart"></i></button>
-                <span class="badge">SALE</span>
-            </div>
-
-            <div class="product-info">
-                <h3>Maybelline</h3>
-                <p class="product-name">Beauty Makeup Collection</p>
-                <div class="rating">4.7 <i class="fa-solid fa-star"></i> <span>1.8k</span></div>
-                <div class="price">₹899 <del>₹1,499</del> <strong>40% OFF</strong></div>
-
-                <div class="size-row">
-                    <button class="size-btn">S</button>
-                    <button class="size-btn">M</button>
-                    <button class="size-btn">L</button>
-                    <button class="size-btn">XL</button>
-                </div>
-
-                <div class="quantity-row">
-                    <button class="qty-minus">−</button>
-                    <span class="quantity">1</span>
-                    <button class="qty-plus">+</button>
-                </div>
-
-                <div class="product-buttons">
-                    <button class="quick-view">Quick View</button>
-                    <button class="add-bag">Add to Bag</button>
-                </div>
-            </div>
-        </article>
-
-    </div>
-</section>
-
-<section class="featured">
-    <div class="featured-content">
-        <span>LIMITED COLLECTION</span>
-        <h2>Style Meets<br>Comfort</h2>
-        <p>Upgrade your wardrobe with our latest collection.</p>
-        <button id="featuredBtn">EXPLORE COLLECTION</button>
-    </div>
-</section>
-
-<section class="offer">
-    <div>
-        <span>EXCLUSIVE OFFER</span>
-        <h2>Flat 50% OFF</h2>
-        <p>On selected styles. Limited time only.</p>
-    </div>
-    <button id="offerBtn">SHOP OFFER</button>
-</section>
+            <div class="offer-shape shape-one"></div>
+            <div class="offer-shape shape-two"></div>
+        </div>
+    </section>
 
 </main>
 
-<footer>
-    <div class="footer-grid">
-        <div>
-            <div class="logo">MYNTRA</div>
-            <p>India's leading fashion destination for every style and occasion.</p>
-        </div>
-
-        <div>
-            <h3>ONLINE SHOPPING</h3>
-            <a href="#">Men</a>
-            <a href="#">Women</a>
-            <a href="#">Kids</a>
-            <a href="#">Beauty</a>
-        </div>
-
-        <div>
-            <h3>CUSTOMER POLICIES</h3>
-            <a href="#">Contact Us</a>
-            <a href="#">FAQ</a>
-            <a href="#">Terms</a>
-            <a href="#">Privacy</a>
-        </div>
-
-        <div>
-            <h3>KEEP IN TOUCH</h3>
+<footer class="footer">
+    <div class="footer-top">
+        <div class="footer-brand">
+            <a href="#home" class="brand footer-logo">
+                <span class="brand-mark">M</span>
+                <span class="brand-text">MYNTRA</span>
+            </a>
+            <p>
+                Fashion, beauty and lifestyle — curated for
+                the way you want to live.
+            </p>
             <div class="socials">
-                <i class="fa-brands fa-facebook"></i>
-                <i class="fa-brands fa-instagram"></i>
-                <i class="fa-brands fa-twitter"></i>
-                <i class="fa-brands fa-youtube"></i>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-youtube"></i></a>
             </div>
+        </div>
+
+        <div class="footer-column">
+            <h4>Shop</h4>
+            <a href="#products">Men</a>
+            <a href="#products">Women</a>
+            <a href="#products">Kids</a>
+            <a href="#products">Beauty</a>
+            <a href="#products">Trending</a>
+        </div>
+
+        <div class="footer-column">
+            <h4>Help</h4>
+            <a href="#">Contact Us</a>
+            <a href="#">Track Order</a>
+            <a href="#">Returns</a>
+            <a href="#">Shipping</a>
+            <a href="#">FAQs</a>
+        </div>
+
+        <div class="footer-column">
+            <h4>Experience</h4>
+            <a href="#">Myntra Studio</a>
+            <a href="#">Myntra Insider</a>
+            <a href="#">Gift Cards</a>
+            <a href="#">Coupons</a>
+            <a href="#">Careers</a>
         </div>
     </div>
 
-    <div class="copyright">
-        © 2026 Myntra Clone. Academic Project.
+    <div class="footer-bottom">
+        <span>© 2026 Myntra Clone. Academic Project.</span>
+        <div>
+            <span>Privacy</span>
+            <span>Terms</span>
+            <span>Made with ♥ for fashion</span>
+        </div>
     </div>
 </footer>
 
-<div class="modal" id="quickViewModal">
-    <div class="modal-box">
-        <button class="close-modal" id="closeModal">×</button>
+<div class="toast" id="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span>Added to bag</span>
+</div>
+
+<div class="modal-overlay" id="quickViewModal">
+    <div class="quick-modal">
+        <button class="modal-close" id="modalClose">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
 
         <div class="modal-image">
             <img id="modalImage" src="" alt="">
         </div>
 
-        <div class="modal-content">
-            <span id="modalBrand"></span>
+        <div class="modal-info">
+            <span class="modal-brand" id="modalBrand"></span>
             <h2 id="modalName"></h2>
+            <div class="modal-rating" id="modalRating"></div>
             <p id="modalDescription"></p>
 
-            <div class="modal-rating">
-                <span id="modalRating"></span>
-                <i class="fa-solid fa-star"></i>
+            <div class="modal-price">
+                <strong id="modalPrice"></strong>
+                <del id="modalOldPrice"></del>
+                <span id="modalDiscount"></span>
             </div>
 
-            <div class="modal-price" id="modalPrice"></div>
-
-            <h4>Select Size</h4>
-
-            <div class="modal-sizes">
-                <button class="modal-size">S</button>
-                <button class="modal-size">M</button>
-                <button class="modal-size">L</button>
-                <button class="modal-size">XL</button>
+            <div class="modal-size">
+                <span>Select Size</span>
+                <div id="modalSizes"></div>
             </div>
 
             <div class="modal-quantity">
-                <button id="modalMinus">−</button>
-                <span id="modalQuantity">1</span>
-                <button id="modalPlus">+</button>
+                <span>Quantity</span>
+                <div class="quantity">
+                    <button id="modalMinus">−</button>
+                    <span id="modalQty">1</span>
+                    <button id="modalPlus">+</button>
+                </div>
             </div>
 
-            <button id="modalAddBag" class="modal-add">ADD TO BAG</button>
+            <button class="modal-add" id="modalAdd">
+                Add to Bag
+                <i class="fa-solid fa-bag-shopping"></i>
+            </button>
         </div>
     </div>
 </div>
 
-<div class="cart-overlay" id="cartOverlay"></div>
-
-<aside class="cart-drawer" id="cartDrawer">
-    <div class="cart-header">
-        <div>
-            <span>YOUR SHOPPING</span>
-            <h2>Bag</h2>
-        </div>
-        <button id="closeCart">×</button>
-    </div>
-
-    <div class="cart-items" id="cartItems">
-        <div class="empty-cart">
-            <i class="fa-solid fa-bag-shopping"></i>
-            <h3>Your bag is empty</h3>
-            <p>Add something you love!</p>
-        </div>
-    </div>
-
-    <div class="cart-footer">
-        <div class="cart-total">
-            <span>Total</span>
-            <strong id="cartTotal">₹0</strong>
-        </div>
-
-        <button id="checkoutBtn">PLACE ORDER</button>
-    </div>
-</aside>
-
-<div class="toast" id="toast"></div>
+<div class="mobile-bottom-nav">
+    <button onclick="document.getElementById('home').scrollIntoView({behavior:'smooth'})">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+    </button>
+    <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">
+        <i class="fa-solid fa-compass"></i>
+        <span>Explore</span>
+    </button>
+    <button id="mobileWishlist">
+        <i class="fa-regular fa-heart"></i>
+        <span>Wishlist</span>
+    </button>
+    <button id="mobileBag">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span>Bag</span>
+    </button>
+</div>
 
 <script src="script.js"></script>
 </body>
