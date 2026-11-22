@@ -10,7 +10,6 @@ if (searchInput) {
 
         products.forEach(function (product) {
             const productText = product.textContent.toLowerCase();
-
             product.style.display = productText.includes(searchValue) ? "" : "none";
         });
     });
@@ -130,24 +129,54 @@ sizeButtons.forEach(function (button) {
     });
 });
 
+const quantityMinusButtons = document.querySelectorAll(".quantity-minus");
+const quantityPlusButtons = document.querySelectorAll(".quantity-plus");
+
+quantityMinusButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+        const quantityValue = button.parentElement.querySelector(".quantity-value");
+        let quantity = parseInt(quantityValue.textContent);
+
+        if (quantity > 1) {
+            quantity--;
+            quantityValue.textContent = quantity;
+        }
+    });
+});
+
+quantityPlusButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+        const quantityValue = button.parentElement.querySelector(".quantity-value");
+        let quantity = parseInt(quantityValue.textContent);
+
+        if (quantity < 10) {
+            quantity++;
+            quantityValue.textContent = quantity;
+        }
+    });
+});
+
 const bagButtons = document.querySelectorAll(".add-bag-btn");
 
 bagButtons.forEach(function (button) {
     button.addEventListener("click", function () {
         const productCard = button.closest(".product-card");
         const selectedSize = productCard?.querySelector(".size-btn.active");
+        const quantityElement = productCard?.querySelector(".quantity-value");
 
         if (productCard && !selectedSize) {
             alert("Please select a size first.");
             return;
         }
 
-        bagCount++;
+        const quantity = quantityElement ? parseInt(quantityElement.textContent) : 1;
+
+        bagCount += quantity;
         updateBagCount();
 
         const originalText = button.innerHTML;
 
-        button.innerHTML = '<i class="fa-solid fa-check"></i> Added to Bag';
+        button.innerHTML = `<i class="fa-solid fa-check"></i> Added ${quantity} Item${quantity > 1 ? "s" : ""}`;
         button.style.background = "#287a3e";
 
         setTimeout(function () {
@@ -285,6 +314,16 @@ quickViewButtons.forEach(function (button) {
                         </div>
                     </div>
 
+                    <div class="quick-view-quantity">
+                        <span class="quantity-title">Quantity</span>
+
+                        <div class="quantity-control modal-quantity-control">
+                            <button class="quantity-btn modal-quantity-minus">−</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn modal-quantity-plus">+</button>
+                        </div>
+                    </div>
+
                     <div class="quick-view-price">
                         ${productPrice}
                     </div>
@@ -323,6 +362,28 @@ quickViewButtons.forEach(function (button) {
             });
         });
 
+        const modalMinusButton = modal.querySelector(".modal-quantity-minus");
+        const modalPlusButton = modal.querySelector(".modal-quantity-plus");
+        const modalQuantityValue = modal.querySelector(".quantity-value");
+
+        modalMinusButton.addEventListener("click", function () {
+            let quantity = parseInt(modalQuantityValue.textContent);
+
+            if (quantity > 1) {
+                quantity--;
+                modalQuantityValue.textContent = quantity;
+            }
+        });
+
+        modalPlusButton.addEventListener("click", function () {
+            let quantity = parseInt(modalQuantityValue.textContent);
+
+            if (quantity < 10) {
+                quantity++;
+                modalQuantityValue.textContent = quantity;
+            }
+        });
+
         const modalBagButton = modal.querySelector(".modal-bag-btn");
 
         modalBagButton.addEventListener("click", function () {
@@ -333,11 +394,13 @@ quickViewButtons.forEach(function (button) {
                 return;
             }
 
-            bagCount++;
+            const quantity = parseInt(modalQuantityValue.textContent);
+
+            bagCount += quantity;
             updateBagCount();
 
             modalBagButton.innerHTML =
-                '<i class="fa-solid fa-check"></i> Added to Bag';
+                `<i class="fa-solid fa-check"></i> Added ${quantity} Item${quantity > 1 ? "s" : ""}`;
 
             modalBagButton.style.background = "#287a3e";
 
@@ -366,7 +429,7 @@ if (offerShopBtn) {
             behavior: "smooth"
         });
     });
-}
+});
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("Myntra Clone loaded successfully.");
