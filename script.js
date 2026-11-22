@@ -1,4 +1,5 @@
 let bagCount = 0;
+let wishlistCount = 0;
 
 const searchInput = document.getElementById("searchInput");
 
@@ -105,14 +106,28 @@ heartButtons.forEach(function (button) {
         button.classList.toggle("active");
 
         if (button.classList.contains("active")) {
+            wishlistCount++;
+
             icon.classList.remove("fa-regular");
             icon.classList.add("fa-solid");
         } else {
+            wishlistCount--;
+
             icon.classList.remove("fa-solid");
             icon.classList.add("fa-regular");
         }
+
+        updateWishlistCount();
     });
 });
+
+function updateWishlistCount() {
+    const wishlistCountElement = document.querySelector(".wishlist-count");
+
+    if (wishlistCountElement) {
+        wishlistCountElement.textContent = wishlistCount;
+    }
+}
 
 const bagButtons = document.querySelectorAll(".add-bag-btn");
 
@@ -153,12 +168,10 @@ const wishlistBtn = document.getElementById("wishlistBtn");
 
 if (wishlistBtn) {
     wishlistBtn.addEventListener("click", function () {
-        const wishlistItems = document.querySelectorAll(".product-heart.active").length;
-
-        if (wishlistItems === 0) {
+        if (wishlistCount === 0) {
             alert("Your wishlist is empty.");
         } else {
-            alert(`You have ${wishlistItems} item(s) in your wishlist.`);
+            alert(`You have ${wishlistCount} item(s) in your wishlist.`);
         }
     });
 }
