@@ -621,3 +621,48 @@ updateBagCount();
 updateWishlistUI();
 renderCart();
 filterProducts();
+const pageLoader = document.getElementById("pageLoader");
+
+function startPageReveal() {
+    const revealElements = document.querySelectorAll(
+        ".reveal, .reveal-card"
+    );
+
+    if (!("IntersectionObserver" in window)) {
+        revealElements.forEach(element => {
+            element.classList.add("visible");
+        });
+        return;
+    }
+
+    const observer = new IntersectionObserver(
+        entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        },
+        {
+            threshold: 0.12,
+            rootMargin: "0px 0px -50px 0px"
+        }
+    );
+
+    revealElements.forEach(element => {
+        observer.observe(element);
+    });
+}
+
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        pageLoader.classList.add("loaded");
+
+        document
+            .querySelector(".reveal-hero")
+            ?.classList.add("visible");
+
+        startPageReveal();
+    }, 700);
+});
