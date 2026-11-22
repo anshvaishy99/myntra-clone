@@ -11,11 +11,7 @@ if (searchInput) {
         products.forEach(function (product) {
             const productText = product.textContent.toLowerCase();
 
-            if (productText.includes(searchValue)) {
-                product.style.display = "";
-            } else {
-                product.style.display = "none";
-            }
+            product.style.display = productText.includes(searchValue) ? "" : "none";
         });
     });
 }
@@ -49,16 +45,9 @@ categoryCards.forEach(function (card) {
 
         products.forEach(function (product) {
             const productText = product.textContent.toLowerCase();
+            const categoryText = category.toLowerCase();
 
-            if (category === "Men") {
-                product.style.display = productText.includes("men") ? "" : "none";
-            } else if (category === "Women") {
-                product.style.display = productText.includes("women") ? "" : "none";
-            } else if (category === "Kids") {
-                product.style.display = productText.includes("kids") ? "" : "none";
-            } else if (category === "Beauty") {
-                product.style.display = productText.includes("beauty") ? "" : "none";
-            }
+            product.style.display = productText.includes(categoryText) ? "" : "none";
         });
 
         document.getElementById("trending").scrollIntoView({
@@ -228,6 +217,14 @@ quickViewButtons.forEach(function (button) {
             productCard.querySelector(".product-description")?.textContent ||
             "Premium fashion product.";
 
+        const rating =
+            productCard.querySelector(".rating")?.textContent.trim() ||
+            "4.5 ★";
+
+        const ratingCount =
+            productCard.querySelector(".rating-count")?.textContent.trim() ||
+            "1k Ratings";
+
         const modal = document.createElement("div");
 
         modal.className = "quick-view-modal active";
@@ -242,6 +239,16 @@ quickViewButtons.forEach(function (button) {
                     <p class="brand">${brand}</p>
 
                     <h2>${productName}</h2>
+
+                    <div class="quick-view-rating">
+                        <span class="rating">
+                            ${rating}
+                        </span>
+
+                        <span class="rating-count">
+                            ${ratingCount}
+                        </span>
+                    </div>
 
                     <p>${description}</p>
 
@@ -271,8 +278,7 @@ quickViewButtons.forEach(function (button) {
             }
         });
 
-        const modalBagButton =
-            modal.querySelector(".modal-bag-btn");
+        const modalBagButton = modal.querySelector(".modal-bag-btn");
 
         modalBagButton.addEventListener("click", function () {
             bagCount++;
@@ -290,8 +296,7 @@ quickViewButtons.forEach(function (button) {
     });
 });
 
-const featuredShopBtn =
-    document.getElementById("featuredShopBtn");
+const featuredShopBtn = document.getElementById("featuredShopBtn");
 
 if (featuredShopBtn) {
     featuredShopBtn.addEventListener("click", function () {
@@ -301,8 +306,7 @@ if (featuredShopBtn) {
     });
 }
 
-const offerShopBtn =
-    document.getElementById("offerShopBtn");
+const offerShopBtn = document.getElementById("offerShopBtn");
 
 if (offerShopBtn) {
     offerShopBtn.addEventListener("click", function () {
