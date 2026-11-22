@@ -3,16 +3,19 @@ let bagCount = 0;
 const searchInput = document.getElementById("searchInput");
 
 if (searchInput) {
-    searchInput.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-            const searchValue = searchInput.value.trim();
+    searchInput.addEventListener("input", function () {
+        const searchValue = searchInput.value.toLowerCase().trim();
+        const products = document.querySelectorAll(".product-card");
 
-            if (searchValue === "") {
-                alert("Please enter something to search.");
+        products.forEach(function (product) {
+            const productText = product.textContent.toLowerCase();
+
+            if (productText.includes(searchValue)) {
+                product.style.display = "";
             } else {
-                alert(`Searching for "${searchValue}"...`);
+                product.style.display = "none";
             }
-        }
+        });
     });
 }
 
