@@ -440,9 +440,50 @@ button {
     font-weight: 700;
 }
 
+.size-section {
+    margin: 12px 0 5px;
+}
+
+.size-title {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: #282c3f;
+    margin-bottom: 7px;
+}
+
+.size-options {
+    display: flex;
+    gap: 7px;
+}
+
+.size-btn {
+    width: 36px;
+    height: 32px;
+    border: 1px solid #d4d5d9;
+    background: #fff;
+    color: #282c3f;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.size-btn:hover {
+    border-color: #ff3f6c;
+    color: #ff3f6c;
+}
+
+.size-btn.active {
+    background: #ff3f6c;
+    color: #fff;
+    border-color: #ff3f6c;
+}
+
 .quick-view-btn {
     width: 100%;
-    margin-top: 8px;
+    margin-top: 12px;
     padding: 10px;
     border: 1px solid #ff3f6c;
     background: #fff;
@@ -540,6 +581,14 @@ button {
 }
 
 .quick-view-rating .rating {
+    font-size: 12px;
+}
+
+.quick-view-size {
+    margin-top: 20px;
+}
+
+.quick-view-size .size-title {
     font-size: 12px;
 }
 
@@ -837,8 +886,12 @@ button {
         height: 390px;
     }
 
-    .rating-row {
-        flex-wrap: wrap;
+    .size-options {
+        gap: 6px;
+    }
+
+    .size-btn {
+        width: 40px;
     }
 
     .quick-view-content {

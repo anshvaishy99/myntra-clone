@@ -116,10 +116,32 @@ function updateWishlistCount() {
     }
 }
 
+const sizeButtons = document.querySelectorAll(".size-btn");
+
+sizeButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+        const sizeContainer = button.closest(".size-options");
+
+        sizeContainer.querySelectorAll(".size-btn").forEach(function (sizeButton) {
+            sizeButton.classList.remove("active");
+        });
+
+        button.classList.add("active");
+    });
+});
+
 const bagButtons = document.querySelectorAll(".add-bag-btn");
 
 bagButtons.forEach(function (button) {
     button.addEventListener("click", function () {
+        const productCard = button.closest(".product-card");
+        const selectedSize = productCard?.querySelector(".size-btn.active");
+
+        if (productCard && !selectedSize) {
+            alert("Please select a size first.");
+            return;
+        }
+
         bagCount++;
         updateBagCount();
 
@@ -252,6 +274,17 @@ quickViewButtons.forEach(function (button) {
 
                     <p>${description}</p>
 
+                    <div class="quick-view-size">
+                        <span class="size-title">Select Size</span>
+
+                        <div class="size-options modal-size-options">
+                            <button class="size-btn">S</button>
+                            <button class="size-btn">M</button>
+                            <button class="size-btn">L</button>
+                            <button class="size-btn">XL</button>
+                        </div>
+                    </div>
+
                     <div class="quick-view-price">
                         ${productPrice}
                     </div>
@@ -278,9 +311,28 @@ quickViewButtons.forEach(function (button) {
             }
         });
 
+        const modalSizeButtons = modal.querySelectorAll(".size-btn");
+
+        modalSizeButtons.forEach(function (sizeButton) {
+            sizeButton.addEventListener("click", function () {
+                modalSizeButtons.forEach(function (button) {
+                    button.classList.remove("active");
+                });
+
+                sizeButton.classList.add("active");
+            });
+        });
+
         const modalBagButton = modal.querySelector(".modal-bag-btn");
 
         modalBagButton.addEventListener("click", function () {
+            const selectedSize = modal.querySelector(".size-btn.active");
+
+            if (!selectedSize) {
+                alert("Please select a size first.");
+                return;
+            }
+
             bagCount++;
             updateBagCount();
 
