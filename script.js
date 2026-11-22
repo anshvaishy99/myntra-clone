@@ -107,12 +107,10 @@ heartButtons.forEach(function (button) {
 
         if (button.classList.contains("active")) {
             wishlistCount++;
-
             icon.classList.remove("fa-regular");
             icon.classList.add("fa-solid");
         } else {
             wishlistCount--;
-
             icon.classList.remove("fa-solid");
             icon.classList.add("fa-regular");
         }
@@ -207,6 +205,112 @@ navLinks.forEach(function (link) {
         }
     });
 });
+
+const quickViewButtons = document.querySelectorAll(".quick-view-btn");
+
+quickViewButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+        const productCard = button.closest(".product-card");
+
+        const productName =
+            productCard.querySelector("h3")?.textContent || "Product";
+
+        const brand =
+            productCard.querySelector(".brand")?.textContent || "Myntra";
+
+        const productPrice =
+            productCard.querySelector(".price")?.textContent || "Price not available";
+
+        const productImage =
+            productCard.querySelector("img")?.src || "";
+
+        const description =
+            productCard.querySelector(".product-description")?.textContent ||
+            "Premium fashion product.";
+
+        const modal = document.createElement("div");
+
+        modal.className = "quick-view-modal active";
+
+        modal.innerHTML = `
+            <div class="quick-view-content">
+                <button class="close-modal">&times;</button>
+
+                <img src="${productImage}" alt="${productName}">
+
+                <div class="quick-view-details">
+                    <p class="brand">${brand}</p>
+
+                    <h2>${productName}</h2>
+
+                    <p>${description}</p>
+
+                    <div class="quick-view-price">
+                        ${productPrice}
+                    </div>
+
+                    <button class="add-bag-btn modal-bag-btn">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        Add to Bag
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const closeButton = modal.querySelector(".close-modal");
+
+        closeButton.addEventListener("click", function () {
+            modal.remove();
+        });
+
+        modal.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                modal.remove();
+            }
+        });
+
+        const modalBagButton =
+            modal.querySelector(".modal-bag-btn");
+
+        modalBagButton.addEventListener("click", function () {
+            bagCount++;
+            updateBagCount();
+
+            modalBagButton.innerHTML =
+                '<i class="fa-solid fa-check"></i> Added to Bag';
+
+            modalBagButton.style.background = "#287a3e";
+
+            setTimeout(function () {
+                modal.remove();
+            }, 800);
+        });
+    });
+});
+
+const featuredShopBtn =
+    document.getElementById("featuredShopBtn");
+
+if (featuredShopBtn) {
+    featuredShopBtn.addEventListener("click", function () {
+        document.getElementById("trending").scrollIntoView({
+            behavior: "smooth"
+        });
+    });
+}
+
+const offerShopBtn =
+    document.getElementById("offerShopBtn");
+
+if (offerShopBtn) {
+    offerShopBtn.addEventListener("click", function () {
+        document.getElementById("trending").scrollIntoView({
+            behavior: "smooth"
+        });
+    });
+}
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("Myntra Clone loaded successfully.");
