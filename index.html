@@ -552,6 +552,11 @@
                 </div>
 
                 <div class="checkout-form">
+                    <div class="checkout-field full" id="checkoutSavedWrap" hidden>
+                        <label for="checkoutSaved">Saved Addresses</label>
+                        <select id="checkoutSaved"></select>
+                    </div>
+
                     <div class="checkout-field full">
                         <label for="checkoutName">Full Name</label>
                         <input id="checkoutName" type="text" placeholder="Enter your full name">
@@ -782,57 +787,208 @@
         <button class="account-close" id="accountClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
-    <div class="account-body">
-        <div class="account-user">
+    <div class="account-hero">
+        <div class="account-avatar-wrap">
             <div class="account-avatar" id="accountAvatar">A</div>
-            <div>
-                <strong id="accountHeadName"></strong>
-                <span id="accountHeadEmail"></span>
-            </div>
+            <button type="button" class="avatar-edit" id="avatarEdit" title="Change photo"><i class="fa-solid fa-camera"></i></button>
+            <input type="file" id="avatarInput" accept="image/*" hidden>
         </div>
-
-        <div class="account-stats">
-            <button type="button" id="accountOrdersBtn"><strong id="accStatOrders">0</strong><span>Orders</span></button>
-            <button type="button" id="accountWishlistBtn"><strong id="accStatWishlist">0</strong><span>Wishlist</span></button>
-            <button type="button" id="accountBagBtn"><strong id="accStatBag">0</strong><span>Bag</span></button>
+        <div class="account-hero-info">
+            <strong id="accountHeadName"></strong>
+            <span id="accountHeadEmail"></span>
+            <small id="accountMember"></small>
+            <button type="button" class="avatar-remove" id="avatarRemove" hidden>Remove photo</button>
         </div>
+    </div>
 
-        <form id="accountForm" class="account-form" novalidate>
-            <div class="account-field full">
-                <label for="accountName">Full Name</label>
-                <input id="accountName" type="text" autocomplete="name" placeholder="Your full name">
+    <div class="account-tabs">
+        <button type="button" class="account-tab active" data-account-tab="overview">Overview</button>
+        <button type="button" class="account-tab" data-account-tab="details">Details</button>
+        <button type="button" class="account-tab" data-account-tab="addresses">Addresses</button>
+        <button type="button" class="account-tab" data-account-tab="security">Security</button>
+    </div>
+
+    <div class="account-body">
+
+        <section class="account-panel" data-account-panel="overview">
+            <div class="acc-card">
+                <div class="completeness-top"><strong>Profile strength</strong><span id="profilePercent">0%</span></div>
+                <div class="completeness-bar"><i id="profileBar"></i></div>
+                <p class="completeness-hint" id="profileMissing"></p>
             </div>
 
-            <div class="account-field">
-                <label for="accountMobile">Mobile Number</label>
-                <input id="accountMobile" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile">
+            <div class="acc-stats">
+                <button type="button" id="accountOrdersBtn"><strong id="accStatOrders">0</strong><span>Orders</span></button>
+                <button type="button" id="accountWishlistBtn"><strong id="accStatWishlist">0</strong><span>Wishlist</span></button>
+                <button type="button" id="accountBagBtn"><strong id="accStatBag">0</strong><span>Bag</span></button>
+                <div><strong id="accStatSpent">₹0</strong><span>Spent</span></div>
             </div>
 
-            <div class="account-field">
-                <label for="accountEmail">Email Address</label>
-                <input id="accountEmail" type="email" readonly>
+            <div class="acc-section-title">
+                <h3>Recent orders</h3>
+                <button type="button" id="accountViewOrders">View all</button>
+            </div>
+            <div id="accountRecent"></div>
+
+            <div class="acc-section-title">
+                <h3>Need help?</h3>
+            </div>
+            <div class="acc-links">
+                <button type="button" data-acc-help="contact"><i class="fa-regular fa-envelope"></i>Contact Us</button>
+                <button type="button" data-acc-help="returns"><i class="fa-solid fa-rotate-left"></i>Returns</button>
+                <button type="button" data-acc-help="shipping"><i class="fa-solid fa-truck-fast"></i>Shipping</button>
+                <button type="button" data-acc-help="faq"><i class="fa-regular fa-circle-question"></i>FAQ</button>
+            </div>
+        </section>
+
+        <section class="account-panel" data-account-panel="details" hidden>
+            <form id="accountForm" class="account-form" novalidate>
+                <div class="account-field full">
+                    <label for="accountName">Full Name</label>
+                    <input id="accountName" type="text" autocomplete="name" placeholder="Your full name">
+                </div>
+
+                <div class="account-field">
+                    <label for="accountMobile">Mobile Number</label>
+                    <input id="accountMobile" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile">
+                </div>
+
+                <div class="account-field">
+                    <label for="accountEmail">Email Address</label>
+                    <input id="accountEmail" type="email" readonly>
+                </div>
+
+                <div class="account-field">
+                    <label for="accountGender">Gender</label>
+                    <select id="accountGender">
+                        <option value="">Select</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+
+                <div class="account-field">
+                    <label for="accountDob">Date of Birth</label>
+                    <input id="accountDob" type="date">
+                </div>
+
+                <p class="account-message full" id="accountMessage"></p>
+
+                <button type="submit" class="account-save full">Save Details</button>
+            </form>
+        </section>
+
+        <section class="account-panel" data-account-panel="addresses" hidden>
+            <div class="acc-section-title first">
+                <h3>Saved addresses</h3>
+                <button type="button" id="addAddressBtn"><i class="fa-solid fa-plus"></i> Add new</button>
             </div>
 
-            <div class="account-field full">
-                <label for="accountAddress">Saved Address</label>
-                <textarea id="accountAddress" rows="2" placeholder="House no., street, area"></textarea>
+            <div id="addressList"></div>
+
+            <form id="addressForm" class="account-form acc-card" hidden novalidate>
+                <input type="hidden" id="addrId">
+
+                <div class="account-field">
+                    <label for="addrLabel">Address Type</label>
+                    <select id="addrLabel">
+                        <option>Home</option>
+                        <option>Work</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div class="account-field">
+                    <label for="addrName">Full Name</label>
+                    <input id="addrName" type="text" placeholder="Receiver name">
+                </div>
+
+                <div class="account-field">
+                    <label for="addrMobile">Mobile Number</label>
+                    <input id="addrMobile" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile">
+                </div>
+
+                <div class="account-field">
+                    <label for="addrPin">PIN Code</label>
+                    <input id="addrPin" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit PIN">
+                </div>
+
+                <div class="account-field full">
+                    <label for="addrCity">City</label>
+                    <input id="addrCity" type="text" placeholder="City">
+                </div>
+
+                <div class="account-field full">
+                    <label for="addrText">Full Address</label>
+                    <textarea id="addrText" rows="2" placeholder="House no., street, area"></textarea>
+                </div>
+
+                <label class="acc-check full"><input type="checkbox" id="addrDefault"> Make this my default address</label>
+
+                <p class="account-message full" id="addressMessage"></p>
+
+                <div class="acc-form-actions full">
+                    <button type="submit" class="account-save">Save Address</button>
+                    <button type="button" class="acc-cancel" id="addressCancel">Cancel</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="account-panel" data-account-panel="security" hidden>
+            <div class="acc-card">
+                <h3>Change password</h3>
+                <form id="passwordForm" class="account-form" novalidate>
+                    <div class="account-field full">
+                        <label for="curPass">Current Password</label>
+                        <input id="curPass" type="password" autocomplete="current-password" placeholder="Current password">
+                    </div>
+                    <div class="account-field">
+                        <label for="newPass">New Password</label>
+                        <input id="newPass" type="password" autocomplete="new-password" placeholder="At least 6 characters">
+                    </div>
+                    <div class="account-field">
+                        <label for="confirmPass">Confirm Password</label>
+                        <input id="confirmPass" type="password" autocomplete="new-password" placeholder="Repeat new password">
+                    </div>
+                    <p class="account-message full" id="passMessage"></p>
+                    <button type="submit" class="account-save full">Update Password</button>
+                </form>
             </div>
 
-            <div class="account-field">
-                <label for="accountCity">City</label>
-                <input id="accountCity" type="text" placeholder="City">
+            <div class="acc-card">
+                <h3>Preferences</h3>
+                <label class="acc-switch">
+                    <span><strong>Order updates</strong><small>Status, delivery and return alerts</small></span>
+                    <input type="checkbox" id="prefOrders">
+                    <i></i>
+                </label>
+                <label class="acc-switch">
+                    <span><strong>Offers and promotions</strong><small>Sales, coupons and new arrivals</small></span>
+                    <input type="checkbox" id="prefOffers">
+                    <i></i>
+                </label>
             </div>
 
-            <div class="account-field">
-                <label for="accountPin">PIN Code</label>
-                <input id="accountPin" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit PIN">
+            <div class="acc-card acc-danger">
+                <h3>Delete account</h3>
+                <p>This permanently removes your profile, saved addresses, orders, returns and support requests from this browser.</p>
+                <button type="button" class="acc-danger-btn" id="deleteAccountBtn">Delete my account</button>
+                <div id="deleteBox" hidden>
+                    <input id="deletePass" type="password" placeholder="Enter your password to confirm">
+                    <p class="account-message" id="deleteMessage"></p>
+                    <div class="acc-form-actions">
+                        <button type="button" class="acc-danger-btn solid" id="confirmDelete">Confirm delete</button>
+                        <button type="button" class="acc-cancel" id="cancelDelete">Cancel</button>
+                    </div>
+                </div>
             </div>
+        </section>
 
-            <p class="account-message full" id="accountMessage"></p>
+    </div>
 
-            <button type="submit" class="account-save full">Save Details</button>
-        </form>
-
+    <div class="account-footer">
         <button type="button" class="account-logout" id="accountLogoutBtn">
             <i class="fa-solid fa-right-from-bracket"></i> Logout
         </button>

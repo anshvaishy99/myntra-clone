@@ -112,10 +112,9 @@ const accountForm = $("#accountForm");
 const accountName = $("#accountName");
 const accountMobile = $("#accountMobile");
 const accountEmail = $("#accountEmail");
-const accountAddress = $("#accountAddress");
-const accountCity = $("#accountCity");
-const accountPin = $("#accountPin");
 const accountMessage = $("#accountMessage");
+const accountGender = $("#accountGender");
+const accountDob = $("#accountDob");
 const accountOrdersBtn = $("#accountOrdersBtn");
 const accountWishlistBtn = $("#accountWishlistBtn");
 const accountBagBtn = $("#accountBagBtn");
@@ -338,7 +337,13 @@ function startSession(user, message) {
         mobile: user.mobile || "",
         address: user.address || "",
         city: user.city || "",
-        pin: user.pin || ""
+        pin: user.pin || "",
+        photo: user.photo || "",
+        gender: user.gender || "",
+        dob: user.dob || "",
+        joinedAt: user.joinedAt || null,
+        addresses: Array.isArray(user.addresses) ? user.addresses : undefined,
+        prefs: user.prefs || { orders: true, offers: false }
     };
 
     saveSession();
@@ -446,7 +451,13 @@ function registerUser() {
             password: hashPassword(password),
             address: "",
             city: "",
-            pin: ""
+            pin: "",
+            photo: "",
+            gender: "",
+            dob: "",
+            joinedAt: Date.now(),
+            addresses: [],
+            prefs: { orders: true, offers: false }
         };
 
         users.push(user);
@@ -832,41 +843,6 @@ function closeCheckout() {
     }
 }
 
-function prefillCheckout() {
-    if (!currentUser) {
-        return;
-    }
-
-    checkoutName.value = currentUser.name || "";
-    checkoutMobile.value = currentUser.mobile || "";
-    checkoutAddress.value = currentUser.address || "";
-    checkoutCity.value = currentUser.city || "";
-    checkoutPin.value = currentUser.pin || "";
-}
-
-function rememberAddress(customer) {
-    currentUser = {
-        ...currentUser,
-        name: currentUser.name || customer.name,
-        mobile: currentUser.mobile || customer.mobile,
-        address: customer.address,
-        city: customer.city,
-        pin: customer.pin
-    };
-
-    saveSession();
-
-    const record = users.find(item => item.email.toLowerCase() === currentUser.email.toLowerCase());
-
-    if (record) {
-        record.mobile = currentUser.mobile;
-        record.address = currentUser.address;
-        record.city = currentUser.city;
-        record.pin = currentUser.pin;
-        saveUsers();
-    }
-}
-
 function applyCouponCode() {
     const code = couponInput.value.trim().toUpperCase();
 
@@ -1172,37 +1148,172 @@ function getUserOrders() {
     return orderHistory.filter(order => !order.userEmail || order.userEmail === currentUser.email);
 }
 
+function getUserRecord() {
+    if (!currentUser) {
+        return null;
+    }
+
+    return users.find(item => item.email.toLowerCase() === currentUser.email.toLowerCase()) || null;
+}
+
+function updateProfile(patch) {
+    currentUser = { ...currentUser, ...patch };
+    saveSession();
+
+    const record = getUserRecord();
+
+    if (record) {
+        Object.assign(record, patch);
+        saveUsers();
+    }
+}
+
+function getAddresses() {
+    if (!currentUser) {
+        return [];
+    }
+
+    if (Array.isArray(currentUser.addresses)) {
+        return currentUser.addresses;
+    }
+
+    if (currentUser.address) {
+        return [{
+            id: "ADRLEGACY",
+            label: "Home",
+            name: currentUser.name || "",
+            mobile: currentUser.mobile || "",
+            pin: currentUser.pin || "",
+            city: currentUser.city || "",
+            address: currentUser.address,
+            isDefault: true
+        }];
+    }
+
+    return [];
+}
+
+function saveAddresses(list) {
+    if (list.length && !list.some(item => item.isDefault)) {
+        list[0].isDefault = true;
+    }
+
+    const main = list.find(item => item.isDefault) || list[0];
+
+    updateProfile({
+        addresses: list,
+        address: main ? main.address : "",
+        city: main ? main.city : "",
+        pin: main ? main.pin : ""
+    });
+}
+
+function showAccountTab(tab) {
+    $$(".account-tab").forEach(button => {
+        button.classList.toggle("active", button.dataset.accountTab === tab);
+    });
+
+    $$(".account-panel").forEach(panel => {
+        panel.hidden = panel.dataset.accountPanel !== tab;
+    });
+
+    $(".account-body").scrollTop = 0;
+}
+
 function renderAccount() {
     if (!currentUser) {
         return;
     }
 
     const name = currentUser.name || currentUser.email.split("@")[0];
+    const orders = getUserOrders();
+    const addresses = getAddresses();
+    const avatar = $("#accountAvatar");
 
-    accountAvatar.textContent = name.trim().charAt(0).toUpperCase();
+    if (currentUser.photo) {
+        avatar.style.backgroundImage = `url(${currentUser.photo})`;
+        avatar.textContent = "";
+        avatar.classList.add("has-photo");
+    } else {
+        avatar.style.backgroundImage = "";
+        avatar.textContent = name.trim().charAt(0).toUpperCase();
+        avatar.classList.remove("has-photo");
+    }
+
+    $("#avatarRemove").hidden = !currentUser.photo;
     accountHeadName.textContent = name;
     accountHeadEmail.textContent = currentUser.email;
 
-    accStatOrders.textContent = getUserOrders().length;
+    $("#accountMember").textContent = currentUser.joinedAt
+        ? `Member since ${new Date(currentUser.joinedAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}`
+        : "Valued customer";
+
+    accStatOrders.textContent = orders.length;
     accStatWishlist.textContent = wishlist.length;
     accStatBag.textContent = bag.reduce((sum, item) => sum + item.quantity, 0);
+    $("#accStatSpent").textContent = money(orders.reduce((sum, order) => sum + order.total, 0));
+
+    const checks = [
+        ["profile photo", !!currentUser.photo],
+        ["mobile number", !!currentUser.mobile],
+        ["date of birth", !!currentUser.dob],
+        ["gender", !!currentUser.gender],
+        ["a saved address", addresses.length > 0]
+    ];
+    const missing = checks.filter(item => !item[1]).map(item => item[0]);
+    const percent = Math.round(((2 + checks.length - missing.length) / (2 + checks.length)) * 100);
+
+    $("#profilePercent").textContent = `${percent}%`;
+    $("#profileBar").style.width = `${percent}%`;
+    $("#profileMissing").textContent = missing.length
+        ? `Add ${missing.join(", ")} to complete your profile.`
+        : "Your profile is complete.";
+
+    const recent = $("#accountRecent");
+
+    recent.innerHTML = orders.length
+        ? orders.slice(0, 3).map(order => {
+            const count = order.items.reduce((sum, item) => sum + item.quantity, 0);
+
+            return `
+                <button type="button" class="recent-order" data-open-orders>
+                    <div>
+                        <strong>${escapeHtml(order.id)}</strong>
+                        <span>${escapeHtml(order.date)} · ${count} item${count === 1 ? "" : "s"}</span>
+                    </div>
+                    <div>
+                        <b>${money(order.total)}</b>
+                        <em>Confirmed</em>
+                    </div>
+                </button>
+            `;
+        }).join("")
+        : `<p class="acc-empty">You have not placed any orders yet.</p>`;
 
     accountName.value = name;
     accountMobile.value = currentUser.mobile || "";
     accountEmail.value = currentUser.email;
-    accountAddress.value = currentUser.address || "";
-    accountCity.value = currentUser.city || "";
-    accountPin.value = currentUser.pin || "";
+    accountGender.value = currentUser.gender || "";
+    accountDob.value = currentUser.dob || "";
     accountMessage.textContent = "";
+
+    const prefs = currentUser.prefs || { orders: true, offers: false };
+
+    $("#prefOrders").checked = !!prefs.orders;
+    $("#prefOffers").checked = !!prefs.offers;
+
+    renderAddresses();
 }
 
-function openAccount() {
+function openAccount(tab) {
     if (!currentUser) {
         openLogin(false);
         return;
     }
 
     renderAccount();
+    showAccountTab(typeof tab === "string" ? tab : "overview");
+    closeAddressForm();
     accountOverlay.classList.add("show");
     accountDrawer.classList.add("open");
     document.body.style.overflow = "hidden";
@@ -1227,7 +1338,7 @@ function closeAccount() {
 function saveAccount() {
     const name = accountName.value.trim();
     const mobile = accountMobile.value.trim();
-    const pin = accountPin.value.trim();
+    const dob = accountDob.value;
 
     accountMessage.style.color = "#e33";
 
@@ -1241,37 +1352,352 @@ function saveAccount() {
         return;
     }
 
-    if (pin && !/^\d{6}$/.test(pin)) {
-        accountMessage.textContent = "Enter a valid 6-digit PIN code.";
+    if (dob && new Date(dob) > new Date()) {
+        accountMessage.textContent = "Date of birth cannot be in the future.";
         return;
     }
 
-    currentUser = {
-        ...currentUser,
-        name,
-        mobile,
-        address: accountAddress.value.trim(),
-        city: accountCity.value.trim(),
-        pin
-    };
-
-    saveSession();
-
-    const record = users.find(item => item.email.toLowerCase() === currentUser.email.toLowerCase());
-
-    if (record) {
-        record.name = currentUser.name;
-        record.mobile = currentUser.mobile;
-        record.address = currentUser.address;
-        record.city = currentUser.city;
-        record.pin = currentUser.pin;
-        saveUsers();
-    }
+    updateProfile({ name, mobile, gender: accountGender.value, dob });
 
     renderAccount();
     accountMessage.style.color = "#168d35";
     accountMessage.textContent = "Your details have been saved.";
     showToast("Profile updated");
+}
+
+function renderAddresses() {
+    const list = getAddresses();
+    const container = $("#addressList");
+
+    if (!list.length) {
+        container.innerHTML = `<p class="acc-empty">No saved addresses yet. Add one to speed up checkout.</p>`;
+        return;
+    }
+
+    container.innerHTML = list.map(item => `
+        <div class="address-card${item.isDefault ? " default" : ""}">
+            <div class="address-top">
+                <span class="address-tag">${escapeHtml(item.label)}</span>
+                ${item.isDefault ? `<span class="address-default">DEFAULT</span>` : ""}
+            </div>
+            <strong>${escapeHtml(item.name)}</strong>
+            <p>${escapeHtml(item.address)}, ${escapeHtml(item.city)} - ${escapeHtml(item.pin)}</p>
+            <span>Mobile: ${escapeHtml(item.mobile)}</span>
+            <div class="address-actions">
+                <button type="button" data-addr-action="edit" data-id="${escapeHtml(item.id)}">Edit</button>
+                ${item.isDefault ? "" : `<button type="button" data-addr-action="default" data-id="${escapeHtml(item.id)}">Set as default</button>`}
+                <button type="button" data-addr-action="delete" data-id="${escapeHtml(item.id)}">Delete</button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function openAddressForm(id) {
+    const list = getAddresses();
+    const item = id ? list.find(entry => entry.id === id) : null;
+
+    $("#addrId").value = item ? item.id : "";
+    $("#addrLabel").value = item ? item.label : "Home";
+    $("#addrName").value = item ? item.name : (currentUser.name || "");
+    $("#addrMobile").value = item ? item.mobile : (currentUser.mobile || "");
+    $("#addrPin").value = item ? item.pin : "";
+    $("#addrCity").value = item ? item.city : "";
+    $("#addrText").value = item ? item.address : "";
+    $("#addrDefault").checked = item ? item.isDefault : list.length === 0;
+    $("#addressMessage").textContent = "";
+
+    $("#addressForm").hidden = false;
+    $("#addrName").focus();
+}
+
+function closeAddressForm() {
+    $("#addressForm").hidden = true;
+}
+
+function saveAddress() {
+    const message = $("#addressMessage");
+    const id = $("#addrId").value;
+    const entry = {
+        id: id || `ADR${Date.now()}`,
+        label: $("#addrLabel").value,
+        name: $("#addrName").value.trim(),
+        mobile: $("#addrMobile").value.trim(),
+        pin: $("#addrPin").value.trim(),
+        city: $("#addrCity").value.trim(),
+        address: $("#addrText").value.trim(),
+        isDefault: $("#addrDefault").checked
+    };
+
+    message.style.color = "#e33";
+
+    if (entry.name.length < 2) {
+        message.textContent = "Please enter the receiver's name.";
+        return;
+    }
+
+    if (!/^\d{10}$/.test(entry.mobile)) {
+        message.textContent = "Enter a valid 10-digit mobile number.";
+        return;
+    }
+
+    if (!/^\d{6}$/.test(entry.pin)) {
+        message.textContent = "Enter a valid 6-digit PIN code.";
+        return;
+    }
+
+    if (!entry.city) {
+        message.textContent = "Please enter the city.";
+        return;
+    }
+
+    if (entry.address.length < 5) {
+        message.textContent = "Please enter the complete address.";
+        return;
+    }
+
+    let list = getAddresses().map(item => ({ ...item }));
+
+    if (entry.isDefault) {
+        list.forEach(item => {
+            item.isDefault = false;
+        });
+    }
+
+    const index = list.findIndex(item => item.id === entry.id);
+
+    if (index >= 0) {
+        list[index] = entry;
+    } else {
+        list.push(entry);
+    }
+
+    saveAddresses(list);
+    closeAddressForm();
+    renderAccount();
+    showToast(index >= 0 ? "Address updated" : "Address saved");
+}
+
+function handleAddressAction(action, id) {
+    let list = getAddresses().map(item => ({ ...item }));
+
+    if (action === "edit") {
+        openAddressForm(id);
+        return;
+    }
+
+    if (action === "default") {
+        list.forEach(item => {
+            item.isDefault = item.id === id;
+        });
+        saveAddresses(list);
+        renderAccount();
+        showToast("Default address updated");
+        return;
+    }
+
+    if (action === "delete") {
+        if (!window.confirm("Delete this address?")) {
+            return;
+        }
+
+        list = list.filter(item => item.id !== id);
+        saveAddresses(list);
+        renderAccount();
+        showToast("Address deleted");
+    }
+}
+
+function changePassword() {
+    const message = $("#passMessage");
+    const record = getUserRecord();
+    const current = $("#curPass").value;
+    const next = $("#newPass").value;
+    const confirm = $("#confirmPass").value;
+
+    message.style.color = "#e33";
+
+    if (!record) {
+        message.textContent = "Password change is available for accounts created with Create Account.";
+        return;
+    }
+
+    if (record.password !== hashPassword(current)) {
+        message.textContent = "Current password is incorrect.";
+        return;
+    }
+
+    if (next.length < 6) {
+        message.textContent = "New password must contain at least 6 characters.";
+        return;
+    }
+
+    if (next === current) {
+        message.textContent = "New password must be different from the current one.";
+        return;
+    }
+
+    if (next !== confirm) {
+        message.textContent = "New passwords do not match.";
+        return;
+    }
+
+    record.password = hashPassword(next);
+    saveUsers();
+
+    $("#passwordForm").reset();
+    message.style.color = "#168d35";
+    message.textContent = "Your password has been updated.";
+    showToast("Password updated");
+}
+
+function savePreferences() {
+    updateProfile({
+        prefs: {
+            orders: $("#prefOrders").checked,
+            offers: $("#prefOffers").checked
+        }
+    });
+
+    showToast("Preferences saved");
+}
+
+function deleteAccount() {
+    const message = $("#deleteMessage");
+    const record = getUserRecord();
+
+    message.style.color = "#e33";
+
+    if (record && record.password !== hashPassword($("#deletePass").value)) {
+        message.textContent = "Password is incorrect.";
+        return;
+    }
+
+    const email = currentUser.email.toLowerCase();
+
+    users = users.filter(item => item.email.toLowerCase() !== email);
+    saveUsers();
+
+    orderHistory = orderHistory.filter(order => !order.userEmail || order.userEmail.toLowerCase() !== email);
+    saveOrders();
+
+    returnRequests = returnRequests.filter(item => item.userEmail.toLowerCase() !== email);
+    saveReturns();
+
+    tickets = tickets.filter(item => item.email.toLowerCase() !== email);
+    saveTickets();
+
+    $("#deleteBox").hidden = true;
+    $("#deletePass").value = "";
+
+    logoutUser();
+    showToast("Your account has been deleted");
+}
+
+function processAvatar(file) {
+    if (!file || !file.type.startsWith("image/")) {
+        showToast("Please choose an image file");
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        showToast("Image must be under 5 MB");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+        const image = new Image();
+
+        image.onload = () => {
+            const canvas = document.createElement("canvas");
+            const size = 200;
+            const side = Math.min(image.width, image.height);
+
+            canvas.width = size;
+            canvas.height = size;
+
+            canvas.getContext("2d").drawImage(
+                image,
+                (image.width - side) / 2,
+                (image.height - side) / 2,
+                side,
+                side,
+                0,
+                0,
+                size,
+                size
+            );
+
+            updateProfile({ photo: canvas.toDataURL("image/jpeg", 0.85) });
+            renderAccount();
+            showToast("Profile photo updated");
+        };
+
+        image.onerror = () => showToast("Could not read this image");
+        image.src = reader.result;
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function fillCheckoutFields(address) {
+    checkoutName.value = address.name || (currentUser && currentUser.name) || "";
+    checkoutMobile.value = address.mobile || (currentUser && currentUser.mobile) || "";
+    checkoutAddress.value = address.address || "";
+    checkoutCity.value = address.city || "";
+    checkoutPin.value = address.pin || "";
+}
+
+function prefillCheckout() {
+    if (!currentUser) {
+        return;
+    }
+
+    const list = getAddresses();
+    const select = $("#checkoutSaved");
+    const main = list.find(item => item.isDefault) || list[0];
+
+    $("#checkoutSavedWrap").hidden = !list.length;
+
+    select.innerHTML = `<option value="">Enter a new address</option>` + list.map(item =>
+        `<option value="${escapeHtml(item.id)}">${escapeHtml(item.label)} · ${escapeHtml(item.city)} - ${escapeHtml(item.pin)}${item.isDefault ? " (Default)" : ""}</option>`
+    ).join("");
+
+    if (main) {
+        select.value = main.id;
+        fillCheckoutFields(main);
+    } else {
+        fillCheckoutFields({});
+    }
+}
+
+function rememberAddress(customer) {
+    const list = getAddresses().map(item => ({ ...item }));
+
+    const exists = list.some(item =>
+        item.pin === customer.pin &&
+        item.address.toLowerCase() === customer.address.toLowerCase()
+    );
+
+    if (!exists) {
+        list.push({
+            id: `ADR${Date.now()}`,
+            label: "Home",
+            name: customer.name,
+            mobile: customer.mobile,
+            pin: customer.pin,
+            city: customer.city,
+            address: customer.address,
+            isDefault: list.length === 0
+        });
+    }
+
+    saveAddresses(list);
+
+    if (!currentUser.mobile) {
+        updateProfile({ mobile: customer.mobile });
+    }
 }
 
 function applyFilters() {
@@ -1642,7 +2068,7 @@ window.addEventListener("scroll", () => {
     mobileMenu.classList.remove("show");
 }, { passive: true });
 
-[regMobile, accountMobile, checkoutMobile, accountPin, checkoutPin].forEach(input => {
+[regMobile, accountMobile, checkoutMobile, checkoutPin].forEach(input => {
     input.addEventListener("input", () => {
         input.value = input.value.replace(/\D/g, "");
     });
@@ -2218,4 +2644,88 @@ document.addEventListener("keydown", event => {
     if (event.key === "Escape") {
         closeHelp();
     }
+});
+
+$$(".account-tab").forEach(button => {
+    button.addEventListener("click", () => showAccountTab(button.dataset.accountTab));
+});
+
+$("#avatarEdit").addEventListener("click", () => $("#avatarInput").click());
+
+$("#avatarInput").addEventListener("change", event => {
+    processAvatar(event.target.files[0]);
+    event.target.value = "";
+});
+
+$("#avatarRemove").addEventListener("click", () => {
+    updateProfile({ photo: "" });
+    renderAccount();
+    showToast("Profile photo removed");
+});
+
+$("#accountViewOrders").addEventListener("click", () => {
+    closeAccount();
+    openOrderHistory();
+});
+
+$("#accountRecent").addEventListener("click", event => {
+    if (event.target.closest("[data-open-orders]")) {
+        closeAccount();
+        openOrderHistory();
+    }
+});
+
+$$("[data-acc-help]").forEach(button => {
+    button.addEventListener("click", () => {
+        closeAccount();
+        openHelp(button.dataset.accHelp);
+    });
+});
+
+$("#addAddressBtn").addEventListener("click", () => openAddressForm(""));
+$("#addressCancel").addEventListener("click", closeAddressForm);
+
+$("#addressForm").addEventListener("submit", event => {
+    event.preventDefault();
+    saveAddress();
+});
+
+$("#addressList").addEventListener("click", event => {
+    const button = event.target.closest("[data-addr-action]");
+
+    if (button) {
+        handleAddressAction(button.dataset.addrAction, button.dataset.id);
+    }
+});
+
+$("#passwordForm").addEventListener("submit", event => {
+    event.preventDefault();
+    changePassword();
+});
+
+$("#prefOrders").addEventListener("change", savePreferences);
+$("#prefOffers").addEventListener("change", savePreferences);
+
+$("#deleteAccountBtn").addEventListener("click", () => {
+    $("#deleteBox").hidden = false;
+    $("#deletePass").focus();
+});
+
+$("#cancelDelete").addEventListener("click", () => {
+    $("#deleteBox").hidden = true;
+    $("#deletePass").value = "";
+    $("#deleteMessage").textContent = "";
+});
+
+$("#confirmDelete").addEventListener("click", deleteAccount);
+
+$("#checkoutSaved").addEventListener("change", event => {
+    const item = getAddresses().find(entry => entry.id === event.target.value);
+    fillCheckoutFields(item || {});
+});
+
+[$("#addrMobile"), $("#addrPin")].forEach(input => {
+    input.addEventListener("input", () => {
+        input.value = input.value.replace(/\D/g, "");
+    });
 });
