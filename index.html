@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Myntra — Fashion Store</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Myntra — Fashion Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <div class="page-loader" id="pageLoader">
@@ -32,7 +31,7 @@
 
 <header class="navbar">
     <div class="nav-left">
-        <button type="button" class="mobile-menu-btn" id="mobileMenuBtn">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
             <i class="fa-solid fa-bars"></i>
         </button>
 
@@ -49,25 +48,25 @@
 
     <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="searchInput" placeholder="Search for products, brands and more">
-        <button type="button" id="clearSearch">
+        <input id="searchInput" type="text" placeholder="Search for products, brands and more">
+        <button id="clearSearch">
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
 
     <div class="nav-actions">
-        <button type="button" id="profileBtn">
+        <button id="profileBtn">
             <i class="fa-regular fa-user"></i>
             <span>Profile</span>
         </button>
 
-        <button type="button" id="wishlistBtn">
+        <button id="wishlistBtn">
             <i class="fa-regular fa-heart"></i>
             <span>Wishlist</span>
             <b id="wishlistCount">0</b>
         </button>
 
-        <button type="button" id="bagBtn">
+        <button id="bagBtn">
             <i class="fa-solid fa-bag-shopping"></i>
             <span>Bag</span>
             <b id="bagCount">0</b>
@@ -92,29 +91,14 @@
         <p>Discover premium fashion, effortless silhouettes and everyday pieces designed for your next look.</p>
 
         <div class="hero-buttons">
-            <a href="#products" class="primary-btn">
-                Shop Collection
-                <i class="fa-solid fa-arrow-right"></i>
-            </a>
-
-            <a href="#vibes" class="secondary-btn">
-                Explore Vibes
-            </a>
+            <a href="#products" class="primary-btn">Shop Collection <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="#vibes" class="secondary-btn">Explore Vibes</a>
         </div>
 
         <div class="hero-stats">
-            <div>
-                <strong>10K+</strong>
-                <span>Styles</span>
-            </div>
-            <div>
-                <strong>500+</strong>
-                <span>Brands</span>
-            </div>
-            <div>
-                <strong>4.8★</strong>
-                <span>Customer Rating</span>
-            </div>
+            <div><strong>10K+</strong><span>Styles</span></div>
+            <div><strong>500+</strong><span>Brands</span></div>
+            <div><strong>4.8★</strong><span>Customer Rating</span></div>
         </div>
     </div>
 
@@ -138,37 +122,10 @@
 </section>
 
 <section class="trust-strip reveal">
-    <div>
-        <i class="fa-solid fa-truck-fast"></i>
-        <div>
-            <strong>FREE DELIVERY</strong>
-            <span>On orders above ₹999</span>
-        </div>
-    </div>
-
-    <div>
-        <i class="fa-solid fa-rotate-left"></i>
-        <div>
-            <strong>EASY RETURNS</strong>
-            <span>7 day return policy</span>
-        </div>
-    </div>
-
-    <div>
-        <i class="fa-solid fa-shield-halved"></i>
-        <div>
-            <strong>SECURE PAYMENT</strong>
-            <span>100% protected checkout</span>
-        </div>
-    </div>
-
-    <div>
-        <i class="fa-solid fa-headset"></i>
-        <div>
-            <strong>24/7 SUPPORT</strong>
-            <span>We're here to help</span>
-        </div>
-    </div>
+    <div><i class="fa-solid fa-truck-fast"></i><div><strong>FREE DELIVERY</strong><span>On orders above ₹999</span></div></div>
+    <div><i class="fa-solid fa-rotate-left"></i><div><strong>EASY RETURNS</strong><span>7 day return policy</span></div></div>
+    <div><i class="fa-solid fa-shield-halved"></i><div><strong>SECURE PAYMENT</strong><span>100% protected checkout</span></div></div>
+    <div><i class="fa-solid fa-headset"></i><div><strong>24/7 SUPPORT</strong><span>We're here to help</span></div></div>
 </section>
 
 <section class="vibe-section reveal" id="vibes">
@@ -182,34 +139,19 @@
 
     <div class="vibe-grid">
         <a href="#products" class="vibe-card vibe-dark" data-category="men">
-            <div>
-                <span>01</span>
-                <h3>Quiet<br>Luxury</h3>
-            </div>
+            <div><span>01</span><h3>Quiet<br>Luxury</h3></div>
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
         </a>
-
         <a href="#products" class="vibe-card vibe-light" data-category="women">
-            <div>
-                <span>02</span>
-                <h3>Soft<br>Romance</h3>
-            </div>
+            <div><span>02</span><h3>Soft<br>Romance</h3></div>
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
         </a>
-
         <a href="#products" class="vibe-card vibe-pink" data-category="beauty">
-            <div>
-                <span>03</span>
-                <h3>Bold<br>Beauty</h3>
-            </div>
+            <div><span>03</span><h3>Bold<br>Beauty</h3></div>
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
         </a>
-
         <a href="#products" class="vibe-card vibe-beige" data-category="kids">
-            <div>
-                <span>04</span>
-                <h3>Playful<br>Energy</h3>
-            </div>
+            <div><span>04</span><h3>Playful<br>Energy</h3></div>
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
         </a>
     </div>
@@ -223,7 +165,7 @@
         </div>
 
         <div class="filter-actions">
-            <button type="button" class="filter-toggle" id="filterToggle">
+            <button class="filter-toggle" id="filterToggle">
                 <i class="fa-solid fa-sliders"></i>
                 Filters
                 <b id="filterCount">0</b>
@@ -243,46 +185,46 @@
         <div class="filter-group">
             <span>Category</span>
             <div>
-                <button type="button" class="filter-option active" data-filter="category" data-value="all">All</button>
-                <button type="button" class="filter-option" data-filter="category" data-value="men">Men</button>
-                <button type="button" class="filter-option" data-filter="category" data-value="women">Women</button>
-                <button type="button" class="filter-option" data-filter="category" data-value="kids">Kids</button>
-                <button type="button" class="filter-option" data-filter="category" data-value="beauty">Beauty</button>
+                <button class="filter-option active" data-filter="category" data-value="all">All</button>
+                <button class="filter-option" data-filter="category" data-value="men">Men</button>
+                <button class="filter-option" data-filter="category" data-value="women">Women</button>
+                <button class="filter-option" data-filter="category" data-value="kids">Kids</button>
+                <button class="filter-option" data-filter="category" data-value="beauty">Beauty</button>
             </div>
         </div>
 
         <div class="filter-group">
             <span>Price</span>
             <div>
-                <button type="button" class="filter-option" data-filter="price" data-value="all">All</button>
-                <button type="button" class="filter-option" data-filter="price" data-value="under1000">Under ₹1,000</button>
-                <button type="button" class="filter-option" data-filter="price" data-value="1000-2000">₹1,000–₹2,000</button>
-                <button type="button" class="filter-option" data-filter="price" data-value="above2000">Above ₹2,000</button>
+                <button class="filter-option active" data-filter="price" data-value="all">All</button>
+                <button class="filter-option" data-filter="price" data-value="under1000">Under ₹1,000</button>
+                <button class="filter-option" data-filter="price" data-value="1000-2000">₹1,000–₹2,000</button>
+                <button class="filter-option" data-filter="price" data-value="above2000">Above ₹2,000</button>
             </div>
         </div>
 
         <div class="filter-group">
             <span>Rating</span>
             <div>
-                <button type="button" class="filter-option" data-filter="rating" data-value="all">All</button>
-                <button type="button" class="filter-option" data-filter="rating" data-value="4">4★ & above</button>
-                <button type="button" class="filter-option" data-filter="rating" data-value="4.5">4.5★ & above</button>
+                <button class="filter-option active" data-filter="rating" data-value="all">All</button>
+                <button class="filter-option" data-filter="rating" data-value="4">4★ & above</button>
+                <button class="filter-option" data-filter="rating" data-value="4.5">4.5★ & above</button>
             </div>
         </div>
 
         <div class="filter-group">
             <span>Discount</span>
             <div>
-                <button type="button" class="filter-option" data-filter="discount" data-value="all">All</button>
-                <button type="button" class="filter-option" data-filter="discount" data-value="20">20%+</button>
-                <button type="button" class="filter-option" data-filter="discount" data-value="30">30%+</button>
-                <button type="button" class="filter-option" data-filter="discount" data-value="40">40%+</button>
+                <button class="filter-option active" data-filter="discount" data-value="all">All</button>
+                <button class="filter-option" data-filter="discount" data-value="20">20%+</button>
+                <button class="filter-option" data-filter="discount" data-value="30">30%+</button>
+                <button class="filter-option" data-filter="discount" data-value="40">40%+</button>
             </div>
         </div>
 
         <div class="filter-bottom">
             <div id="activeFilters"></div>
-            <button type="button" id="resetFilters">Reset Filters</button>
+            <button id="resetFilters">Reset Filters</button>
         </div>
     </div>
 
@@ -292,363 +234,122 @@
 
     <div class="products-grid" id="productsGrid">
 
-        <article class="product-card reveal"
-            data-name="Roadster Oversized Shirt"
-            data-brand="Roadster"
-            data-category="men"
-            data-price="1299"
-            data-rating="4.5"
-            data-discount="35"
-            data-image="https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=80">
-
+        <article class="product-card reveal" data-name="Roadster Oversized Shirt" data-brand="Roadster" data-category="men" data-price="1299" data-rating="4.5" data-discount="35" data-image="https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=80">
             <div class="product-image">
                 <img src="https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=80" alt="Roadster Oversized Shirt">
-
                 <span class="discount-badge">35% OFF</span>
-
-                <button type="button" class="wishlist-product">
-                    <i class="fa-regular fa-heart"></i>
-                </button>
-
-                <button type="button" class="quick-view">
-                    QUICK VIEW
-                </button>
+                <button class="wishlist-product"><i class="fa-regular fa-heart"></i></button>
+                <button class="quick-view">QUICK VIEW</button>
             </div>
-
             <div class="product-info">
                 <span class="product-brand">Roadster</span>
                 <h3>Oversized Shirt</h3>
-
-                <div class="product-rating">
-                    <span>4.5 <i class="fa-solid fa-star"></i></span>
-                    <small>1.2k ratings</small>
-                </div>
-
-                <div class="product-price">
-                    <strong>₹1,299</strong>
-                    <del>₹1,999</del>
-                    <span>35% OFF</span>
-                </div>
-
-                <div class="size-row">
-                    <button type="button">S</button>
-                    <button type="button">M</button>
-                    <button type="button">L</button>
-                    <button type="button">XL</button>
-                </div>
-
+                <div class="product-rating"><span>4.5 <i class="fa-solid fa-star"></i></span><small>1.2k ratings</small></div>
+                <div class="product-price"><strong>₹1,299</strong><del>₹1,999</del><span>35% OFF</span></div>
+                <div class="size-row"><button>S</button><button>M</button><button>L</button><button>XL</button></div>
                 <div class="product-bottom">
-                    <div class="quantity-control">
-                        <button type="button" class="qty-minus">−</button>
-                        <span class="qty-value">1</span>
-                        <button type="button" class="qty-plus">+</button>
-                    </div>
-
-                    <button type="button" class="add-bag">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                        Add
-                    </button>
+                    <div class="quantity-control"><button class="qty-minus">−</button><span class="qty-value">1</span><button class="qty-plus">+</button></div>
+                    <button class="add-bag"><i class="fa-solid fa-bag-shopping"></i> Add</button>
                 </div>
             </div>
         </article>
 
-        <article class="product-card reveal"
-            data-name="H&M Relaxed Linen Shirt"
-            data-brand="H&M"
-            data-category="men"
-            data-price="1499"
-            data-rating="4.7"
-            data-discount="25"
-            data-image="https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&w=900&q=80">
-
+        <article class="product-card reveal" data-name="H&M Relaxed Linen Shirt" data-brand="H&M" data-category="men" data-price="1499" data-rating="4.7" data-discount="25" data-image="https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&w=900&q=80">
             <div class="product-image">
                 <img src="https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&w=900&q=80" alt="H&M Relaxed Linen Shirt">
-
                 <span class="discount-badge">25% OFF</span>
-
-                <button type="button" class="wishlist-product">
-                    <i class="fa-regular fa-heart"></i>
-                </button>
-
-                <button type="button" class="quick-view">
-                    QUICK VIEW
-                </button>
+                <button class="wishlist-product"><i class="fa-regular fa-heart"></i></button>
+                <button class="quick-view">QUICK VIEW</button>
             </div>
-
             <div class="product-info">
                 <span class="product-brand">H&M</span>
                 <h3>Relaxed Linen Shirt</h3>
-
-                <div class="product-rating">
-                    <span>4.7 <i class="fa-solid fa-star"></i></span>
-                    <small>980 ratings</small>
-                </div>
-
-                <div class="product-price">
-                    <strong>₹1,499</strong>
-                    <del>₹1,999</del>
-                    <span>25% OFF</span>
-                </div>
-
-                <div class="size-row">
-                    <button type="button">S</button>
-                    <button type="button">M</button>
-                    <button type="button">L</button>
-                    <button type="button">XL</button>
-                </div>
-
+                <div class="product-rating"><span>4.7 <i class="fa-solid fa-star"></i></span><small>980 ratings</small></div>
+                <div class="product-price"><strong>₹1,499</strong><del>₹1,999</del><span>25% OFF</span></div>
+                <div class="size-row"><button>S</button><button>M</button><button>L</button><button>XL</button></div>
                 <div class="product-bottom">
-                    <div class="quantity-control">
-                        <button type="button" class="qty-minus">−</button>
-                        <span class="qty-value">1</span>
-                        <button type="button" class="qty-plus">+</button>
-                    </div>
-
-                    <button type="button" class="add-bag">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                        Add
-                    </button>
+                    <div class="quantity-control"><button class="qty-minus">−</button><span class="qty-value">1</span><button class="qty-plus">+</button></div>
+                    <button class="add-bag"><i class="fa-solid fa-bag-shopping"></i> Add</button>
                 </div>
             </div>
         </article>
 
-        <article class="product-card reveal"
-            data-name="Mango Floral Midi Dress"
-            data-brand="Mango"
-            data-category="women"
-            data-price="2299"
-            data-rating="4.8"
-            data-discount="40"
-            data-image="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=900&q=80">
-
+        <article class="product-card reveal" data-name="Mango Floral Midi Dress" data-brand="Mango" data-category="women" data-price="2299" data-rating="4.8" data-discount="40" data-image="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=900&q=80">
             <div class="product-image">
                 <img src="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=900&q=80" alt="Mango Floral Midi Dress">
-
                 <span class="discount-badge">40% OFF</span>
-
-                <button type="button" class="wishlist-product">
-                    <i class="fa-regular fa-heart"></i>
-                </button>
-
-                <button type="button" class="quick-view">
-                    QUICK VIEW
-                </button>
+                <button class="wishlist-product"><i class="fa-regular fa-heart"></i></button>
+                <button class="quick-view">QUICK VIEW</button>
             </div>
-
             <div class="product-info">
                 <span class="product-brand">Mango</span>
                 <h3>Floral Midi Dress</h3>
-
-                <div class="product-rating">
-                    <span>4.8 <i class="fa-solid fa-star"></i></span>
-                    <small>2.1k ratings</small>
-                </div>
-
-                <div class="product-price">
-                    <strong>₹2,299</strong>
-                    <del>₹3,799</del>
-                    <span>40% OFF</span>
-                </div>
-
-                <div class="size-row">
-                    <button type="button">XS</button>
-                    <button type="button">S</button>
-                    <button type="button">M</button>
-                    <button type="button">L</button>
-                </div>
-
+                <div class="product-rating"><span>4.8 <i class="fa-solid fa-star"></i></span><small>2.1k ratings</small></div>
+                <div class="product-price"><strong>₹2,299</strong><del>₹3,799</del><span>40% OFF</span></div>
+                <div class="size-row"><button>XS</button><button>S</button><button>M</button><button>L</button></div>
                 <div class="product-bottom">
-                    <div class="quantity-control">
-                        <button type="button" class="qty-minus">−</button>
-                        <span class="qty-value">1</span>
-                        <button type="button" class="qty-plus">+</button>
-                    </div>
-
-                    <button type="button" class="add-bag">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                        Add
-                    </button>
+                    <div class="quantity-control"><button class="qty-minus">−</button><span class="qty-value">1</span><button class="qty-plus">+</button></div>
+                    <button class="add-bag"><i class="fa-solid fa-bag-shopping"></i> Add</button>
                 </div>
             </div>
         </article>
 
-        <article class="product-card reveal"
-            data-name="Nike Air Max Running Shoes"
-            data-brand="Nike"
-            data-category="men"
-            data-price="4999"
-            data-rating="4.9"
-            data-discount="30"
-            data-image="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80">
-
+        <article class="product-card reveal" data-name="Nike Air Max Running Shoes" data-brand="Nike" data-category="men" data-price="4999" data-rating="4.9" data-discount="30" data-image="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80">
             <div class="product-image">
                 <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80" alt="Nike Air Max Running Shoes">
-
                 <span class="discount-badge">30% OFF</span>
-
-                <button type="button" class="wishlist-product">
-                    <i class="fa-regular fa-heart"></i>
-                </button>
-
-                <button type="button" class="quick-view">
-                    QUICK VIEW
-                </button>
+                <button class="wishlist-product"><i class="fa-regular fa-heart"></i></button>
+                <button class="quick-view">QUICK VIEW</button>
             </div>
-
             <div class="product-info">
                 <span class="product-brand">Nike</span>
                 <h3>Air Max Running Shoes</h3>
-
-                <div class="product-rating">
-                    <span>4.9 <i class="fa-solid fa-star"></i></span>
-                    <small>3.4k ratings</small>
-                </div>
-
-                <div class="product-price">
-                    <strong>₹4,999</strong>
-                    <del>₹7,099</del>
-                    <span>30% OFF</span>
-                </div>
-
-                <div class="size-row">
-                    <button type="button">6</button>
-                    <button type="button">7</button>
-                    <button type="button">8</button>
-                    <button type="button">9</button>
-                    <button type="button">10</button>
-                </div>
-
+                <div class="product-rating"><span>4.9 <i class="fa-solid fa-star"></i></span><small>3.4k ratings</small></div>
+                <div class="product-price"><strong>₹4,999</strong><del>₹7,099</del><span>30% OFF</span></div>
+                <div class="size-row"><button>6</button><button>7</button><button>8</button><button>9</button><button>10</button></div>
                 <div class="product-bottom">
-                    <div class="quantity-control">
-                        <button type="button" class="qty-minus">−</button>
-                        <span class="qty-value">1</span>
-                        <button type="button" class="qty-plus">+</button>
-                    </div>
-
-                    <button type="button" class="add-bag">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                        Add
-                    </button>
+                    <div class="quantity-control"><button class="qty-minus">−</button><span class="qty-value">1</span><button class="qty-plus">+</button></div>
+                    <button class="add-bag"><i class="fa-solid fa-bag-shopping"></i> Add</button>
                 </div>
             </div>
         </article>
 
-        <article class="product-card reveal"
-            data-name="Maybelline Super Stay Matte Lipstick"
-            data-brand="Maybelline"
-            data-category="beauty"
-            data-price="799"
-            data-rating="4.6"
-            data-discount="20"
-            data-image="https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=900&q=80">
-
+        <article class="product-card reveal" data-name="Maybelline Super Stay Matte Lipstick" data-brand="Maybelline" data-category="beauty" data-price="799" data-rating="4.6" data-discount="20" data-image="https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=900&q=80">
             <div class="product-image">
                 <img src="https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=900&q=80" alt="Maybelline Super Stay Matte Lipstick">
-
                 <span class="discount-badge">20% OFF</span>
-
-                <button type="button" class="wishlist-product">
-                    <i class="fa-regular fa-heart"></i>
-                </button>
-
-                <button type="button" class="quick-view">
-                    QUICK VIEW
-                </button>
+                <button class="wishlist-product"><i class="fa-regular fa-heart"></i></button>
+                <button class="quick-view">QUICK VIEW</button>
             </div>
-
             <div class="product-info">
                 <span class="product-brand">Maybelline</span>
                 <h3>Super Stay Matte Lipstick</h3>
-
-                <div class="product-rating">
-                    <span>4.6 <i class="fa-solid fa-star"></i></span>
-                    <small>1.8k ratings</small>
-                </div>
-
-                <div class="product-price">
-                    <strong>₹799</strong>
-                    <del>₹999</del>
-                    <span>20% OFF</span>
-                </div>
-
-                <div class="size-row">
-                    <button type="button">01</button>
-                    <button type="button">05</button>
-                    <button type="button">08</button>
-                    <button type="button">12</button>
-                </div>
-
+                <div class="product-rating"><span>4.6 <i class="fa-solid fa-star"></i></span><small>1.8k ratings</small></div>
+                <div class="product-price"><strong>₹799</strong><del>₹999</del><span>20% OFF</span></div>
+                <div class="size-row"><button>01</button><button>05</button><button>08</button><button>12</button></div>
                 <div class="product-bottom">
-                    <div class="quantity-control">
-                        <button type="button" class="qty-minus">−</button>
-                        <span class="qty-value">1</span>
-                        <button type="button" class="qty-plus">+</button>
-                    </div>
-
-                    <button type="button" class="add-bag">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                        Add
-                    </button>
+                    <div class="quantity-control"><button class="qty-minus">−</button><span class="qty-value">1</span><button class="qty-plus">+</button></div>
+                    <button class="add-bag"><i class="fa-solid fa-bag-shopping"></i> Add</button>
                 </div>
             </div>
         </article>
 
-        <article class="product-card reveal"
-            data-name="H&M Kids Graphic Oversized Hoodie"
-            data-brand="H&M Kids"
-            data-category="kids"
-            data-price="999"
-            data-rating="4.4"
-            data-discount="45"
-            data-image="https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=900&q=80">
-
+        <article class="product-card reveal" data-name="H&M Kids Graphic Oversized Hoodie" data-brand="H&M Kids" data-category="kids" data-price="999" data-rating="4.4" data-discount="45" data-image="https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=900&q=80">
             <div class="product-image">
                 <img src="https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=900&q=80" alt="H&M Kids Graphic Oversized Hoodie">
-
                 <span class="discount-badge">45% OFF</span>
-
-                <button type="button" class="wishlist-product">
-                    <i class="fa-regular fa-heart"></i>
-                </button>
-
-                <button type="button" class="quick-view">
-                    QUICK VIEW
-                </button>
+                <button class="wishlist-product"><i class="fa-regular fa-heart"></i></button>
+                <button class="quick-view">QUICK VIEW</button>
             </div>
-
             <div class="product-info">
                 <span class="product-brand">H&M Kids</span>
                 <h3>Graphic Oversized Hoodie</h3>
-
-                <div class="product-rating">
-                    <span>4.4 <i class="fa-solid fa-star"></i></span>
-                    <small>720 ratings</small>
-                </div>
-
-                <div class="product-price">
-                    <strong>₹999</strong>
-                    <del>₹1,799</del>
-                    <span>45% OFF</span>
-                </div>
-
-                <div class="size-row">
-                    <button type="button">4Y</button>
-                    <button type="button">6Y</button>
-                    <button type="button">8Y</button>
-                    <button type="button">10Y</button>
-                </div>
-
+                <div class="product-rating"><span>4.4 <i class="fa-solid fa-star"></i></span><small>720 ratings</small></div>
+                <div class="product-price"><strong>₹999</strong><del>₹1,799</del><span>45% OFF</span></div>
+                <div class="size-row"><button>4Y</button><button>6Y</button><button>8Y</button><button>10Y</button></div>
                 <div class="product-bottom">
-                    <div class="quantity-control">
-                        <button type="button" class="qty-minus">−</button>
-                        <span class="qty-value">1</span>
-                        <button type="button" class="qty-plus">+</button>
-                    </div>
-
-                    <button type="button" class="add-bag">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                        Add
-                    </button>
+                    <div class="quantity-control"><button class="qty-minus">−</button><span class="qty-value">1</span><button class="qty-plus">+</button></div>
+                    <button class="add-bag"><i class="fa-solid fa-bag-shopping"></i> Add</button>
                 </div>
             </div>
         </article>
@@ -659,7 +360,7 @@
         <i class="fa-solid fa-magnifying-glass"></i>
         <h3>No products found</h3>
         <p>Try changing your search or filters.</p>
-        <button type="button" id="noResultsReset">Reset Filters</button>
+        <button id="noResultsReset">Reset Filters</button>
     </div>
 </section>
 
@@ -668,12 +369,8 @@
         <span class="section-label">EDITORIAL · 01</span>
         <h2>LESS<br>NOISE.<br><em>MORE</em><br>STYLE.</h2>
         <p>Build a wardrobe that feels like you. Minimal pieces, elevated essentials and timeless silhouettes.</p>
-        <a href="#products" class="primary-btn">
-            Discover More
-            <i class="fa-solid fa-arrow-right"></i>
-        </a>
+        <a href="#products" class="primary-btn">Discover More <i class="fa-solid fa-arrow-right"></i></a>
     </div>
-
     <div class="editorial-art">
         <div class="art-circle"></div>
         <div class="art-shape"></div>
@@ -691,32 +388,9 @@
     </div>
 
     <div class="occasion-grid">
-        <a href="#products" data-category="men" class="occasion-card">
-            <span>01</span>
-            <div>
-                <h3>Workday</h3>
-                <p>Sharp. Simple. Sophisticated.</p>
-            </div>
-            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </a>
-
-        <a href="#products" data-category="women" class="occasion-card">
-            <span>02</span>
-            <div>
-                <h3>Date Night</h3>
-                <p>Make the moment memorable.</p>
-            </div>
-            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </a>
-
-        <a href="#products" data-category="kids" class="occasion-card">
-            <span>03</span>
-            <div>
-                <h3>Weekend</h3>
-                <p>Easy fits for easy days.</p>
-            </div>
-            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </a>
+        <a href="#products" data-category="men" class="occasion-card"><span>01</span><div><h3>Workday</h3><p>Sharp. Simple. Sophisticated.</p></div><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        <a href="#products" data-category="women" class="occasion-card"><span>02</span><div><h3>Date Night</h3><p>Make the moment memorable.</p></div><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        <a href="#products" data-category="kids" class="occasion-card"><span>03</span><div><h3>Weekend</h3><p>Easy fits for easy days.</p></div><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
     </div>
 </section>
 
@@ -726,11 +400,7 @@
         <h2>10% OFF<br>YOUR FIRST ORDER.</h2>
         <p>Use code <strong>MYNTRA10</strong> at checkout.</p>
     </div>
-
-    <a href="#products" class="primary-btn">
-        Start Shopping
-        <i class="fa-solid fa-arrow-right"></i>
-    </a>
+    <a href="#products" class="primary-btn">Start Shopping <i class="fa-solid fa-arrow-right"></i></a>
 </section>
 
 </main>
@@ -741,7 +411,6 @@
             <a href="#" class="logo">myntra<span>.</span></a>
             <p>Fashion that moves with you.</p>
         </div>
-
         <div>
             <span>SHOP</span>
             <a href="#products">Men</a>
@@ -749,7 +418,6 @@
             <a href="#products">Kids</a>
             <a href="#products">Beauty</a>
         </div>
-
         <div>
             <span>HELP</span>
             <a href="#">Contact Us</a>
@@ -757,7 +425,6 @@
             <a href="#">Shipping</a>
             <a href="#">FAQ</a>
         </div>
-
         <div>
             <span>FOLLOW</span>
             <div class="socials">
@@ -781,9 +448,7 @@
 
 <div class="quick-modal" id="quickModal">
     <div class="quick-modal-card">
-        <button type="button" class="modal-close" id="modalClose">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
+        <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
 
         <div class="modal-image">
             <img id="modalImage" src="" alt="">
@@ -807,13 +472,13 @@
             <div class="modal-quantity">
                 <span>Quantity</span>
                 <div>
-                    <button type="button" id="modalMinus">−</button>
+                    <button id="modalMinus">−</button>
                     <span id="modalQty">1</span>
-                    <button type="button" id="modalPlus">+</button>
+                    <button id="modalPlus">+</button>
                 </div>
             </div>
 
-            <button type="button" class="modal-add" id="modalAdd">Add to Bag</button>
+            <button class="modal-add" id="modalAdd">Add to Bag</button>
         </div>
     </div>
 </div>
@@ -826,36 +491,33 @@
             <span class="section-label">YOUR SHOPPING BAG</span>
             <h2>My Bag</h2>
         </div>
-
-        <button type="button" class="cart-close" id="cartClose">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
+        <button class="cart-close" id="cartClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
     <div class="cart-body" id="cartBody"></div>
 
-    <div class="cart-footer" id="cartFooter">
+    <div class="cart-footer">
         <div class="cart-summary">
-            <div>
-                <span>Subtotal</span>
-                <strong id="cartSubtotal">₹0</strong>
-            </div>
-
-            <div>
-                <span>Delivery</span>
-                <strong id="cartDelivery">FREE</strong>
-            </div>
-
-            <div class="cart-total">
-                <span>Total</span>
-                <strong id="cartTotal">₹0</strong>
-            </div>
+            <div><span>Subtotal</span><strong id="cartSubtotal">₹0</strong></div>
+            <div><span>Delivery</span><strong id="cartDelivery">FREE</strong></div>
+            <div class="cart-total"><span>Total</span><strong id="cartTotal">₹0</strong></div>
         </div>
-
-        <button type="button" class="checkout-btn" id="checkoutBtn">
-            Proceed to Checkout
-        </button>
+        <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
     </div>
+</aside>
+
+<div class="wishlist-overlay" id="wishlistOverlay"></div>
+
+<aside class="wishlist-drawer" id="wishlistDrawer">
+    <div class="wishlist-header">
+        <div>
+            <span class="section-label">SAVED FOR LATER</span>
+            <h2>My Wishlist</h2>
+        </div>
+        <button class="wishlist-close" id="wishlistClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="wishlist-body" id="wishlistBody"></div>
 </aside>
 
 <div class="checkout-overlay" id="checkoutOverlay"></div>
@@ -866,31 +528,15 @@
             <span class="section-label">SECURE CHECKOUT</span>
             <h2>Complete Your Order</h2>
         </div>
-
-        <button type="button" class="checkout-close" id="checkoutClose">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
+        <button class="checkout-close" id="checkoutClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
     <div class="checkout-progress">
-        <div class="checkout-step active">
-            <span>1</span>
-            <p>Bag</p>
-        </div>
-
+        <div class="checkout-step active"><span>1</span><p>Bag</p></div>
         <div class="checkout-line"></div>
-
-        <div class="checkout-step active">
-            <span>2</span>
-            <p>Address</p>
-        </div>
-
+        <div class="checkout-step active"><span>2</span><p>Address</p></div>
         <div class="checkout-line"></div>
-
-        <div class="checkout-step active">
-            <span>3</span>
-            <p>Payment</p>
-        </div>
+        <div class="checkout-step active"><span>3</span><p>Payment</p></div>
     </div>
 
     <div class="checkout-content" id="checkoutContent">
@@ -945,35 +591,20 @@
                 <div class="payment-options">
                     <label class="payment-option">
                         <input type="radio" name="paymentMethod" value="UPI">
-                        <span class="payment-icon">
-                            <i class="fa-solid fa-mobile-screen-button"></i>
-                        </span>
-                        <span>
-                            <strong>UPI</strong>
-                            <small>Google Pay, PhonePe, Paytm</small>
-                        </span>
+                        <span class="payment-icon"><i class="fa-solid fa-mobile-screen-button"></i></span>
+                        <span><strong>UPI</strong><small>Google Pay, PhonePe, Paytm</small></span>
                     </label>
 
                     <label class="payment-option">
                         <input type="radio" name="paymentMethod" value="Card">
-                        <span class="payment-icon">
-                            <i class="fa-regular fa-credit-card"></i>
-                        </span>
-                        <span>
-                            <strong>Credit / Debit Card</strong>
-                            <small>Secure card payment</small>
-                        </span>
+                        <span class="payment-icon"><i class="fa-regular fa-credit-card"></i></span>
+                        <span><strong>Credit / Debit Card</strong><small>Secure card payment</small></span>
                     </label>
 
                     <label class="payment-option">
                         <input type="radio" name="paymentMethod" value="COD">
-                        <span class="payment-icon">
-                            <i class="fa-solid fa-money-bill-wave"></i>
-                        </span>
-                        <span>
-                            <strong>Cash on Delivery</strong>
-                            <small>Pay when your order arrives</small>
-                        </span>
+                        <span class="payment-icon"><i class="fa-solid fa-money-bill-wave"></i></span>
+                        <span><strong>Cash on Delivery</strong><small>Pay when your order arrives</small></span>
                     </label>
                 </div>
             </section>
@@ -982,137 +613,116 @@
 
         <aside class="checkout-summary">
             <div class="checkout-card">
-
                 <div class="checkout-card-title">
                     <div>
                         <span class="section-label">YOUR BAG</span>
                         <h3>Order Summary</h3>
                     </div>
-
-                    <span class="checkout-items-count" id="checkoutItemsCount">
-                        0 items
-                    </span>
+                    <span class="checkout-items-count" id="checkoutItemsCount">0 items</span>
                 </div>
 
                 <div class="checkout-products" id="checkoutProducts"></div>
 
                 <div class="coupon-box">
                     <label for="couponInput">Have a coupon?</label>
-
                     <div class="coupon-row">
                         <input id="couponInput" type="text" placeholder="Enter coupon code">
-                        <button type="button" id="applyCoupon">Apply</button>
+                        <button id="applyCoupon">Apply</button>
                     </div>
-
                     <p id="couponMessage"></p>
                 </div>
 
                 <div class="price-details">
-                    <div>
-                        <span>Subtotal</span>
-                        <strong id="checkoutSubtotal">₹0</strong>
-                    </div>
-
-                    <div>
-                        <span>Discount</span>
-                        <strong id="checkoutDiscount">- ₹0</strong>
-                    </div>
-
-                    <div>
-                        <span>Delivery</span>
-                        <strong id="checkoutDelivery">₹0</strong>
-                    </div>
-
-                    <div class="checkout-total">
-                        <span>Total Amount</span>
-                        <strong id="checkoutTotal">₹0</strong>
-                    </div>
+                    <div><span>Subtotal</span><strong id="checkoutSubtotal">₹0</strong></div>
+                    <div><span>Discount</span><strong id="checkoutDiscount">− ₹0</strong></div>
+                    <div><span>Delivery</span><strong id="checkoutDelivery">FREE</strong></div>
+                    <div class="checkout-grand-total"><span>Total</span><strong id="checkoutTotal">₹0</strong></div>
                 </div>
 
-                <button type="button" class="place-order-btn" id="placeOrderBtn">
-                    <span>Place Order</span>
-                    <i class="fa-solid fa-arrow-right"></i>
+                <button class="place-order-btn" id="placeOrderBtn">
+                    Place Order <i class="fa-solid fa-arrow-right"></i>
                 </button>
-
-                <div class="checkout-security">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <span>100% secure checkout experience</span>
-                </div>
-
             </div>
         </aside>
     </div>
 
     <div class="checkout-success" id="checkoutSuccess">
-        <div class="success-icon">
-            <i class="fa-solid fa-check"></i>
-        </div>
-
+        <div class="success-icon"><i class="fa-solid fa-check"></i></div>
         <span class="section-label">ORDER CONFIRMED</span>
-
-        <h2>Order placed successfully</h2>
-
-        <p>
-            Your order has been confirmed and is being prepared for dispatch.
-        </p>
-
-        <div class="order-meta">
-            <div>
-                <span>Order ID</span>
-                <strong id="orderId"></strong>
-            </div>
-
-            <div>
-                <span>Estimated Delivery</span>
-                <strong>3–5 business days</strong>
-            </div>
+        <h2>Thank you for shopping!</h2>
+        <p>Your order has been successfully placed.</p>
+        <div class="order-confirm-box">
+            <span>ORDER ID</span>
+            <strong id="successOrderId">MYN00000000</strong>
         </div>
-
-        <button type="button" class="continue-shopping-btn" id="continueShoppingAfterOrder">
-            Continue Shopping
-        </button>
+        <button class="primary-btn" id="continueShopping">Continue Shopping <i class="fa-solid fa-arrow-right"></i></button>
     </div>
 </aside>
 
-<div class="wishlist-overlay" id="wishlistOverlay"></div>
+<div class="login-overlay" id="loginOverlay"></div>
 
-<aside class="wishlist-drawer" id="wishlistDrawer">
-    <div class="wishlist-header">
+<aside class="login-modal" id="loginModal">
+    <div class="login-visual">
+        <span class="login-brand">myntra<span>.</span></span>
         <div>
-            <span class="section-label">SAVED FOR YOU</span>
-            <h2>Wishlist <span id="wishlistItemCount">0</span></h2>
+            <span class="section-label">YOUR STYLE. YOUR ACCOUNT.</span>
+            <h2>Fashion<br><em>starts here.</em></h2>
+            <p>Sign in to unlock checkout, manage your orders and keep your shopping journey in one place.</p>
         </div>
-
-        <button type="button" class="wishlist-close" id="wishlistClose">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
+        <div class="login-visual-bottom">
+            <span>SECURE ACCOUNT</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </div>
     </div>
 
-    <div class="wishlist-body" id="wishlistBody"></div>
+    <div class="login-panel">
+        <button class="login-close" id="loginClose"><i class="fa-solid fa-xmark"></i></button>
+
+        <div class="login-heading">
+            <span class="section-label">WELCOME BACK</span>
+            <h2>Sign in to continue</h2>
+            <p>Login is required before placing an order.</p>
+        </div>
+
+        <form id="loginForm" class="login-form">
+            <div class="login-field">
+                <label for="loginEmail">Email Address</label>
+                <div>
+                    <i class="fa-regular fa-envelope"></i>
+                    <input id="loginEmail" type="email" autocomplete="email" placeholder="you@example.com">
+                </div>
+            </div>
+
+            <div class="login-field">
+                <label for="loginPassword">Password</label>
+                <div>
+                    <i class="fa-solid fa-lock"></i>
+                    <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password">
+                    <button type="button" id="togglePassword"><i class="fa-regular fa-eye"></i></button>
+                </div>
+            </div>
+
+            <p class="login-message" id="loginMessage"></p>
+
+            <button type="submit" class="login-submit" id="loginSubmit">
+                <span>Login & Continue</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </form>
+
+        <div class="login-note">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Demo account session is saved in this browser.</span>
+        </div>
+    </div>
 </aside>
 
-<nav class="mobile-bottom-nav">
-    <button type="button" id="mobileHomeBtn">
-        <i class="fa-solid fa-house"></i>
-        <span>Home</span>
-    </button>
-
-    <button type="button" id="mobileWishlistBtn">
-        <i class="fa-regular fa-heart"></i>
-        <span>Wishlist</span>
-    </button>
-
-    <button type="button" id="mobileBagBtn">
-        <i class="fa-solid fa-bag-shopping"></i>
-        <span>Bag</span>
-        <b id="mobileBagCount">0</b>
-    </button>
-
-    <button type="button" id="mobileProfileBtn">
-        <i class="fa-regular fa-user"></i>
-        <span>Profile</span>
-    </button>
-</nav>
+<div class="mobile-bottom-nav">
+    <button id="mobileHomeBtn"><i class="fa-solid fa-house"></i><span>Home</span></button>
+    <button id="mobileWishlistBtn"><i class="fa-regular fa-heart"></i><span>Wishlist</span><b id="mobileWishlistCount">0</b></button>
+    <button id="mobileBagBtn"><i class="fa-solid fa-bag-shopping"></i><span>Bag</span><b id="mobileBagCount">0</b></button>
+    <button id="mobileProfileBtn"><i class="fa-regular fa-user"></i><span>Profile</span></button>
+</div>
 
 <script src="script.js"></script>
 </body>

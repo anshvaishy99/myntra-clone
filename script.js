@@ -1,132 +1,452 @@
-const products = [...document.querySelectorAll(".product-card")];
-const searchInput = document.getElementById("searchInput");
-const clearSearch = document.getElementById("clearSearch");
-const sortSelect = document.getElementById("sortSelect");
-const filterToggle = document.getElementById("filterToggle");
-const filterPanel = document.getElementById("filterPanel");
-const resetFilters = document.getElementById("resetFilters");
-const filterCount = document.getElementById("filterCount");
-const activeFilters = document.getElementById("activeFilters");
-const resultCount = document.getElementById("resultCount");
-const noResults = document.getElementById("noResults");
-const noResultsReset = document.getElementById("noResultsReset");
+const $ = selector => document.querySelector(selector);
+const $$ = selector => [...document.querySelectorAll(selector)];
 
-const toast = document.getElementById("toast");
-const toastMessage = document.getElementById("toastMessage");
+const pageLoader = $("#pageLoader");
+const searchInput = $("#searchInput");
+const clearSearch = $("#clearSearch");
+const productsGrid = $("#productsGrid");
+const resultCount = $("#resultCount");
+const noResults = $("#noResults");
+const noResultsReset = $("#noResultsReset");
+const sortSelect = $("#sortSelect");
+const filterToggle = $("#filterToggle");
+const filterPanel = $("#filterPanel");
+const filterCount = $("#filterCount");
+const resetFilters = $("#resetFilters");
+const activeFilters = $("#activeFilters");
 
-const quickModal = document.getElementById("quickModal");
-const modalClose = document.getElementById("modalClose");
-const modalImage = document.getElementById("modalImage");
-const modalBrand = document.getElementById("modalBrand");
-const modalName = document.getElementById("modalName");
-const modalDescription = document.getElementById("modalDescription");
-const modalPrice = document.getElementById("modalPrice");
-const modalSizes = document.getElementById("modalSizes");
-const modalQty = document.getElementById("modalQty");
-const modalMinus = document.getElementById("modalMinus");
-const modalPlus = document.getElementById("modalPlus");
-const modalAdd = document.getElementById("modalAdd");
+const profileBtn = $("#profileBtn");
+const wishlistBtn = $("#wishlistBtn");
+const bagBtn = $("#bagBtn");
 
-const cartOverlay = document.getElementById("cartOverlay");
-const cartDrawer = document.getElementById("cartDrawer");
-const cartClose = document.getElementById("cartClose");
-const cartBody = document.getElementById("cartBody");
-const cartFooter = document.getElementById("cartFooter");
-const cartSubtotal = document.getElementById("cartSubtotal");
-const cartDelivery = document.getElementById("cartDelivery");
+const wishlistCount = $("#wishlistCount");
+const bagCount = $("#bagCount");
+const mobileWishlistCount = $("#mobileWishlistCount");
+const mobileBagCount = $("#mobileBagCount");
 
-const wishlistOverlay = document.getElementById("wishlistOverlay");
-const wishlistDrawer = document.getElementById("wishlistDrawer");
-const wishlistClose = document.getElementById("wishlistClose");
-const wishlistBody = document.getElementById("wishlistBody");
-const wishlistItemCount = document.getElementById("wishlistItemCount");
+const cartOverlay = $("#cartOverlay");
+const cartDrawer = $("#cartDrawer");
+const cartClose = $("#cartClose");
+const cartBody = $("#cartBody");
+const cartSubtotal = $("#cartSubtotal");
+const cartDelivery = $("#cartDelivery");
+const cartTotal = $("#cartTotal");
+const checkoutBtn = $("#checkoutBtn");
 
-const profileBtn = document.getElementById("profileBtn");
-const wishlistBtn = document.getElementById("wishlistBtn");
-const bagBtn = document.getElementById("bagBtn");
+const wishlistOverlay = $("#wishlistOverlay");
+const wishlistDrawer = $("#wishlistDrawer");
+const wishlistClose = $("#wishlistClose");
+const wishlistBody = $("#wishlistBody");
 
-const mobileHomeBtn = document.getElementById("mobileHomeBtn");
-const mobileWishlistBtn = document.getElementById("mobileWishlistBtn");
-const mobileBagBtn = document.getElementById("mobileBagBtn");
-const mobileProfileBtn = document.getElementById("mobileProfileBtn");
+const quickModal = $("#quickModal");
+const modalClose = $("#modalClose");
+const modalImage = $("#modalImage");
+const modalBrand = $("#modalBrand");
+const modalName = $("#modalName");
+const modalDescription = $("#modalDescription");
+const modalPrice = $("#modalPrice");
+const modalSizes = $("#modalSizes");
+const modalQty = $("#modalQty");
+const modalMinus = $("#modalMinus");
+const modalPlus = $("#modalPlus");
+const modalAdd = $("#modalAdd");
 
-const wishlistCount = document.getElementById("wishlistCount");
-const bagCount = document.getElementById("bagCount");
-const mobileBagCount = document.getElementById("mobileBagCount");
+const checkoutOverlay = $("#checkoutOverlay");
+const checkoutModal = $("#checkoutModal");
+const checkoutClose = $("#checkoutClose");
+const checkoutProducts = $("#checkoutProducts");
+const checkoutItemsCount = $("#checkoutItemsCount");
+const checkoutSubtotal = $("#checkoutSubtotal");
+const checkoutDiscount = $("#checkoutDiscount");
+const checkoutDelivery = $("#checkoutDelivery");
+const checkoutTotal = $("#checkoutTotal");
+const couponInput = $("#couponInput");
+const applyCoupon = $("#applyCoupon");
+const couponMessage = $("#couponMessage");
+const placeOrderBtn = $("#placeOrderBtn");
+const checkoutContent = $("#checkoutContent");
+const checkoutSuccess = $("#checkoutSuccess");
+const successOrderId = $("#successOrderId");
+const continueShopping = $("#continueShopping");
 
-const mobileMenuBtn = document.getElementById("mobileMenuBtn");
-const mobileMenu = document.getElementById("mobileMenu");
+const checkoutName = $("#checkoutName");
+const checkoutMobile = $("#checkoutMobile");
+const checkoutPin = $("#checkoutPin");
+const checkoutCity = $("#checkoutCity");
+const checkoutAddress = $("#checkoutAddress");
 
-let wishlist = JSON.parse(localStorage.getItem("myntraWishlist")) || [];
+const loginOverlay = $("#loginOverlay");
+const loginModal = $("#loginModal");
+const loginClose = $("#loginClose");
+const loginForm = $("#loginForm");
+const loginEmail = $("#loginEmail");
+const loginPassword = $("#loginPassword");
+const loginMessage = $("#loginMessage");
+const loginSubmit = $("#loginSubmit");
+const togglePassword = $("#togglePassword");
+
+const mobileMenuBtn = $("#mobileMenuBtn");
+const mobileMenu = $("#mobileMenu");
+const mobileHomeBtn = $("#mobileHomeBtn");
+const mobileWishlistBtn = $("#mobileWishlistBtn");
+const mobileBagBtn = $("#mobileBagBtn");
+const mobileProfileBtn = $("#mobileProfileBtn");
+
 let bag = JSON.parse(localStorage.getItem("myntraBag")) || [];
-let modalProduct = null;
-let modalSelectedSize = "";
+let wishlist = JSON.parse(localStorage.getItem("myntraWishlist")) || [];
+let orderHistory = JSON.parse(localStorage.getItem("myntraOrders")) || [];
+let currentUser = JSON.parse(localStorage.getItem("myntraUser")) || null;
 
-const filters = {
+let currentFilters = {
     category: "all",
     price: "all",
     rating: "all",
     discount: "all"
 };
 
-let toastTimer;
+let appliedCoupon = "";
+let checkoutDiscountValue = 0;
+let quickProduct = null;
+let quickSelectedSize = "";
+let quickQuantity = 1;
+let pendingCheckout = false;
 
-function formatPrice(price) {
-    return `₹${Number(price).toLocaleString("en-IN")}`;
+function money(value) {
+    return `₹${Number(value).toLocaleString("en-IN")}`;
 }
 
-function saveData() {
-    localStorage.setItem("myntraWishlist", JSON.stringify(wishlist));
+function saveBag() {
     localStorage.setItem("myntraBag", JSON.stringify(bag));
 }
 
+function saveWishlist() {
+    localStorage.setItem("myntraWishlist", JSON.stringify(wishlist));
+}
+
+function saveOrders() {
+    localStorage.setItem("myntraOrders", JSON.stringify(orderHistory));
+}
+
 function showToast(message) {
+    const toast = $("#toast");
+    const toastMessage = $("#toastMessage");
+
     toastMessage.textContent = message;
     toast.classList.add("show");
 
-    clearTimeout(toastTimer);
+    clearTimeout(window.toastTimer);
 
-    toastTimer = setTimeout(() => {
+    window.toastTimer = setTimeout(() => {
         toast.classList.remove("show");
-    }, 2200);
+    }, 2500);
 }
 
-function updateWishlistCount() {
+function updateCounts() {
+    const bagTotal = bag.reduce((sum, item) => sum + item.quantity, 0);
+
+    bagCount.textContent = bagTotal;
     wishlistCount.textContent = wishlist.length;
-    wishlistItemCount.textContent = wishlist.length;
+    mobileBagCount.textContent = bagTotal;
+    mobileWishlistCount.textContent = wishlist.length;
+
+    bagCount.style.display = bagTotal ? "grid" : "none";
+    wishlistCount.style.display = wishlist.length ? "grid" : "none";
+    mobileBagCount.style.display = bagTotal ? "grid" : "none";
+    mobileWishlistCount.style.display = wishlist.length ? "grid" : "none";
 }
 
-function updateWishlistUI() {
-    products.forEach(product => {
-        const name = product.dataset.name;
-        const button = product.querySelector(".wishlist-product");
+function updateLoginUI() {
+    const label = profileBtn.querySelector("span");
 
-        if (wishlist.includes(name)) {
-            button.classList.add("active");
-            button.innerHTML = '<i class="fa-solid fa-heart"></i>';
+    if (currentUser) {
+        label.textContent = "Account";
+        mobileProfileBtn.querySelector("span").textContent = "Account";
+    } else {
+        label.textContent = "Profile";
+        mobileProfileBtn.querySelector("span").textContent = "Profile";
+    }
+}
+
+function openLogin(showCheckout = false) {
+    pendingCheckout = showCheckout;
+    loginMessage.textContent = "";
+    loginModal.classList.add("open");
+    loginOverlay.classList.add("show");
+    document.body.style.overflow = "hidden";
+
+    setTimeout(() => loginEmail.focus(), 100);
+}
+
+function closeLogin() {
+    loginModal.classList.remove("open");
+    loginOverlay.classList.remove("show");
+
+    if (
+        !cartDrawer.classList.contains("open") &&
+        !wishlistDrawer.classList.contains("open") &&
+        !checkoutModal.classList.contains("open") &&
+        !quickModal.classList.contains("show")
+    ) {
+        document.body.style.overflow = "";
+    }
+}
+
+function loginUser() {
+    const email = loginEmail.value.trim();
+    const password = loginPassword.value.trim();
+
+    if (!email) {
+        loginMessage.textContent = "Please enter your email.";
+        return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        loginMessage.textContent = "Please enter a valid email.";
+        return;
+    }
+
+    if (password.length < 6) {
+        loginMessage.textContent = "Password must contain at least 6 characters.";
+        return;
+    }
+
+    loginSubmit.disabled = true;
+    loginSubmit.querySelector("span").textContent = "Signing in...";
+
+    setTimeout(() => {
+        currentUser = {
+            email,
+            name: email.split("@")[0]
+        };
+
+        localStorage.setItem("myntraUser", JSON.stringify(currentUser));
+
+        loginSubmit.disabled = false;
+        loginSubmit.querySelector("span").textContent = "Login & Continue";
+
+        loginEmail.value = "";
+        loginPassword.value = "";
+
+        updateLoginUI();
+        closeLogin();
+
+        if (pendingCheckout) {
+            pendingCheckout = false;
+            setTimeout(openCheckout, 200);
         } else {
-            button.classList.remove("active");
-            button.innerHTML = '<i class="fa-regular fa-heart"></i>';
+            showToast("Welcome back to Myntra");
         }
-    });
+    }, 600);
+}
+
+function logoutUser() {
+    currentUser = null;
+    localStorage.removeItem("myntraUser");
+    closeOrderHistory();
+    updateLoginUI();
+    showToast("You have been logged out");
+}
+
+function getProduct(card) {
+    return {
+        name: card.dataset.name,
+        brand: card.dataset.brand,
+        category: card.dataset.category,
+        price: Number(card.dataset.price),
+        rating: Number(card.dataset.rating),
+        discount: Number(card.dataset.discount),
+        image: card.dataset.image
+    };
 }
 
 function getProductByName(name) {
-    return products.find(product => product.dataset.name === name);
+    const card = $$(".product-card").find(item => item.dataset.name === name);
+    return card ? getProduct(card) : null;
 }
 
-function getProductData(product) {
-    const sizes = [...product.querySelectorAll(".size-row button")].map(
-        button => button.textContent.trim()
-    );
+function addToBag(product, size = "M", quantity = 1) {
+    const existing = bag.find(item => item.name === product.name && item.size === size);
 
-    return {
-        name: product.dataset.name,
-        brand: product.dataset.brand,
-        price: Number(product.dataset.price),
-        image: product.dataset.image,
-        sizes
-    };
+    if (existing) {
+        existing.quantity += quantity;
+    } else {
+        bag.push({
+            ...product,
+            size,
+            quantity
+        });
+    }
+
+    saveBag();
+    updateCounts();
+    renderCart();
+    showToast(`${product.name} added to bag`);
+}
+
+function removeFromBag(index) {
+    bag.splice(index, 1);
+    saveBag();
+    updateCounts();
+    renderCart();
+}
+
+function changeBagQuantity(index, change) {
+    bag[index].quantity += change;
+
+    if (bag[index].quantity <= 0) {
+        bag.splice(index, 1);
+    }
+
+    saveBag();
+    updateCounts();
+    renderCart();
+}
+
+function renderCart() {
+    if (!bag.length) {
+        cartBody.innerHTML = `
+            <div class="empty-state">
+                <div>
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <h3>Your bag is empty</h3>
+                    <p>Add something beautiful to your bag.</p>
+                </div>
+            </div>
+        `;
+
+        cartSubtotal.textContent = "₹0";
+        cartDelivery.textContent = "FREE";
+        cartTotal.textContent = "₹0";
+        return;
+    }
+
+    cartBody.innerHTML = bag.map((item, index) => `
+        <div class="cart-item">
+            <div class="cart-item-image">
+                <img src="${item.image}" alt="${item.name}">
+            </div>
+
+            <div class="cart-item-content">
+                <h3>${item.brand}</h3>
+                <p>${item.name}</p>
+                <p>Size: ${item.size}</p>
+                <div class="cart-item-price">${money(item.price)}</div>
+
+                <div class="cart-item-actions">
+                    <button onclick="changeBagQuantity(${index},-1)">−</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="changeBagQuantity(${index},1)">+</button>
+                    <button class="remove-item" onclick="removeFromBag(${index})">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join("");
+
+    const subtotal = bag.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const delivery = subtotal >= 999 ? 0 : 99;
+
+    cartSubtotal.textContent = money(subtotal);
+    cartDelivery.textContent = delivery ? money(delivery) : "FREE";
+    cartTotal.textContent = money(subtotal + delivery);
+}
+
+function openCart() {
+    renderCart();
+    cartOverlay.classList.add("show");
+    cartDrawer.classList.add("open");
+    document.body.style.overflow = "hidden";
+}
+
+function closeCart() {
+    cartOverlay.classList.remove("show");
+    cartDrawer.classList.remove("open");
+
+    if (
+        !wishlistDrawer.classList.contains("open") &&
+        !checkoutModal.classList.contains("open") &&
+        !loginModal.classList.contains("open")
+    ) {
+        document.body.style.overflow = "";
+    }
+}
+
+function toggleWishlist(product) {
+    const index = wishlist.findIndex(item => item.name === product.name);
+
+    if (index >= 0) {
+        wishlist.splice(index, 1);
+        showToast("Removed from wishlist");
+    } else {
+        wishlist.push(product);
+        showToast("Added to wishlist");
+    }
+
+    saveWishlist();
+    updateCounts();
+    updateWishlistButtons();
+    renderWishlist();
+}
+
+function updateWishlistButtons() {
+    $$(".product-card").forEach(card => {
+        const product = getProduct(card);
+        const button = card.querySelector(".wishlist-product");
+        const exists = wishlist.some(item => item.name === product.name);
+
+        button.classList.toggle("active", exists);
+        button.innerHTML = exists
+            ? '<i class="fa-solid fa-heart"></i>'
+            : '<i class="fa-regular fa-heart"></i>';
+    });
+}
+
+function renderWishlist() {
+    if (!wishlist.length) {
+        wishlistBody.innerHTML = `
+            <div class="empty-state">
+                <div>
+                    <i class="fa-regular fa-heart"></i>
+                    <h3>Your wishlist is empty</h3>
+                    <p>Save products you love for later.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    wishlistBody.innerHTML = wishlist.map((item, index) => `
+        <div class="wishlist-item">
+            <div class="wishlist-item-image">
+                <img src="${item.image}" alt="${item.name}">
+            </div>
+
+            <div class="wishlist-item-content">
+                <h3>${item.brand}</h3>
+                <p>${item.name}</p>
+                <strong>${money(item.price)}</strong>
+
+                <div class="wishlist-actions">
+                    <button onclick="addWishlistToBag(${index})">ADD TO BAG</button>
+                    <button onclick="removeWishlist(${index})">REMOVE</button>
+                </div>
+            </div>
+        </div>
+    `).join("");
+}
+
+function addWishlistToBag(index) {
+    addToBag(wishlist[index], "M", 1);
+}
+
+function removeWishlist(index) {
+    wishlist.splice(index, 1);
+    saveWishlist();
+    updateCounts();
+    updateWishlistButtons();
+    renderWishlist();
+    showToast("Removed from wishlist");
 }
 
 function openWishlist() {
@@ -142,412 +462,39 @@ function closeWishlist() {
 
     if (
         !cartDrawer.classList.contains("open") &&
-        !quickModal.classList.contains("show") &&
         !checkoutModal.classList.contains("open") &&
-        !orderHistoryDrawer.classList.contains("open")
+        !loginModal.classList.contains("open")
     ) {
         document.body.style.overflow = "";
     }
 }
 
-function renderWishlist() {
-    const items = wishlist
-        .map(name => getProductByName(name))
-        .filter(Boolean);
-
-    if (!items.length) {
-        wishlistBody.innerHTML = `
-            <div class="wishlist-empty">
-                <div>
-                    <i class="fa-regular fa-heart"></i>
-                    <h3>Your wishlist is empty</h3>
-                    <p>Save your favorite products here and come back anytime.</p>
-                    <button type="button" id="startWishlistShopping">
-                        START SHOPPING
-                    </button>
-                </div>
-            </div>
-        `;
-
-        document
-            .getElementById("startWishlistShopping")
-            .addEventListener("click", closeWishlist);
-
-        return;
-    }
-
-    wishlistBody.innerHTML = items.map(product => {
-        const data = getProductData(product);
-
-        return `
-            <div class="wishlist-item">
-                <div class="wishlist-item-image">
-                    <img src="${data.image}" alt="${data.name}">
-                </div>
-
-                <div class="wishlist-item-content">
-                    <div class="wishlist-item-brand">${data.brand}</div>
-                    <div class="wishlist-item-name">${data.name}</div>
-
-                    <div class="wishlist-item-price">
-                        ${formatPrice(data.price)}
-                    </div>
-
-                    <span class="wishlist-size-label">Select Size</span>
-
-                    <div class="wishlist-size-row">
-                        ${data.sizes.map(size => `
-                            <button type="button" data-size="${size}">
-                                ${size}
-                            </button>
-                        `).join("")}
-                    </div>
-
-                    <button
-                        type="button"
-                        class="wishlist-add"
-                        data-name="${data.name}"
-                    >
-                        ADD TO BAG
-                    </button>
-                </div>
-
-                <button
-                    type="button"
-                    class="wishlist-remove"
-                    data-name="${data.name}"
-                >
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-        `;
-    }).join("");
-
-    wishlistBody.querySelectorAll(".wishlist-size-row").forEach(row => {
-        const buttons = row.querySelectorAll("button");
-
-        buttons.forEach(button => {
-            button.addEventListener("click", () => {
-                buttons.forEach(item => item.classList.remove("selected"));
-                button.classList.add("selected");
-            });
-        });
-    });
-
-    wishlistBody.querySelectorAll(".wishlist-remove").forEach(button => {
-        button.addEventListener("click", () => {
-            const name = button.dataset.name;
-
-            wishlist = wishlist.filter(item => item !== name);
-
-            saveData();
-            updateWishlistCount();
-            updateWishlistUI();
-            renderWishlist();
-
-            showToast("Removed from wishlist");
-        });
-    });
-
-    wishlistBody.querySelectorAll(".wishlist-add").forEach(button => {
-        button.addEventListener("click", () => {
-            const item = button.closest(".wishlist-item");
-            const selectedSize = item.querySelector(".wishlist-size-row .selected");
-
-            if (!selectedSize) {
-                showToast("Please select a size");
-                return;
-            }
-
-            const product = getProductByName(button.dataset.name);
-            const data = getProductData(product);
-
-            addToBag({
-                name: data.name,
-                brand: data.brand,
-                price: data.price,
-                image: data.image,
-                size: selectedSize.textContent.trim(),
-                quantity: 1
-            });
-        });
-    });
-}
-
-products.forEach(product => {
-    const wishlistButton = product.querySelector(".wishlist-product");
-
-    wishlistButton.addEventListener("click", event => {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const name = product.dataset.name;
-
-        if (wishlist.includes(name)) {
-            wishlist = wishlist.filter(item => item !== name);
-            showToast("Removed from wishlist");
-        } else {
-            wishlist.push(name);
-            showToast("Added to wishlist");
-        }
-
-        saveData();
-        updateWishlistCount();
-        updateWishlistUI();
-
-        if (wishlistDrawer.classList.contains("open")) {
-            renderWishlist();
-        }
-    });
-
-    product.querySelectorAll(".size-row button").forEach(button => {
-        button.addEventListener("click", () => {
-            product
-                .querySelectorAll(".size-row button")
-                .forEach(item => item.classList.remove("selected"));
-
-            button.classList.add("selected");
-        });
-    });
-
-    product.querySelector(".qty-minus").addEventListener("click", () => {
-        const value = product.querySelector(".qty-value");
-        value.textContent = Math.max(1, Number(value.textContent) - 1);
-    });
-
-    product.querySelector(".qty-plus").addEventListener("click", () => {
-        const value = product.querySelector(".qty-value");
-        value.textContent = Math.min(10, Number(value.textContent) + 1);
-    });
-
-    product.querySelector(".add-bag").addEventListener("click", () => {
-        const selectedSize = product.querySelector(".size-row .selected");
-
-        if (!selectedSize) {
-            showToast("Please select a size");
-            return;
-        }
-
-        const quantity = Number(
-            product.querySelector(".qty-value").textContent
-        );
-
-        addToBag({
-            name: product.dataset.name,
-            brand: product.dataset.brand,
-            price: Number(product.dataset.price),
-            image: product.dataset.image,
-            size: selectedSize.textContent.trim(),
-            quantity
-        });
-    });
-
-    product.querySelector(".quick-view").addEventListener("click", event => {
-        event.preventDefault();
-        event.stopPropagation();
-        openQuickView(product);
-    });
-});
-
-function updateBagCount() {
-    const total = bag.reduce(
-        (sum, item) => sum + Number(item.quantity),
-        0
-    );
-
-    bagCount.textContent = total;
-    mobileBagCount.textContent = total;
-}
-
-function addToBag(item) {
-    const existing = bag.find(
-        product =>
-            product.name === item.name &&
-            product.size === item.size
-    );
-
-    if (existing) {
-        existing.quantity = Math.min(
-            10,
-            existing.quantity + item.quantity
-        );
-    } else {
-        bag.push(item);
-    }
-
-    saveData();
-    updateBagCount();
-    renderCart();
-    showToast("Added to bag");
-    openCart();
-}
-
-function renderCart() {
-    if (!bag.length) {
-        cartBody.innerHTML = `
-            <div class="cart-empty">
-                <div>
-                    <i class="fa-solid fa-bag-shopping"></i>
-                    <h3>Your bag is empty</h3>
-                    <p>Looks like you haven't added anything yet.</p>
-                    <button type="button" id="continueShopping">
-                        Continue Shopping
-                    </button>
-                </div>
-            </div>
-        `;
-
-        cartFooter.style.display = "none";
-
-        document
-            .getElementById("continueShopping")
-            .addEventListener("click", closeCart);
-
-        return;
-    }
-
-    cartFooter.style.display = "block";
-
-    cartBody.innerHTML = bag.map((item, index) => `
-        <div class="cart-item">
-            <div class="cart-item-image">
-                <img src="${item.image}" alt="${item.name}">
-            </div>
-
-            <div>
-                <div class="cart-item-brand">${item.brand}</div>
-                <div class="cart-item-name">${item.name}</div>
-                <div class="cart-item-meta">Size: ${item.size}</div>
-                <div class="cart-item-price">${formatPrice(item.price)}</div>
-
-                <div class="cart-item-controls">
-                    <button type="button" class="cart-minus" data-index="${index}">−</button>
-                    <span>${item.quantity}</span>
-                    <button type="button" class="cart-plus" data-index="${index}">+</button>
-                </div>
-            </div>
-
-            <button type="button" class="cart-remove" data-index="${index}">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        </div>
-    `).join("");
-
-    cartBody.querySelectorAll(".cart-minus").forEach(button => {
-        button.addEventListener("click", () => {
-            const index = Number(button.dataset.index);
-
-            if (bag[index].quantity > 1) {
-                bag[index].quantity--;
-            } else {
-                bag.splice(index, 1);
-            }
-
-            saveData();
-            updateBagCount();
-            renderCart();
-        });
-    });
-
-    cartBody.querySelectorAll(".cart-plus").forEach(button => {
-        button.addEventListener("click", () => {
-            const index = Number(button.dataset.index);
-
-            bag[index].quantity = Math.min(
-                10,
-                bag[index].quantity + 1
-            );
-
-            saveData();
-            updateBagCount();
-            renderCart();
-        });
-    });
-
-    cartBody.querySelectorAll(".cart-remove").forEach(button => {
-        button.addEventListener("click", () => {
-            const index = Number(button.dataset.index);
-
-            bag.splice(index, 1);
-
-            saveData();
-            updateBagCount();
-            renderCart();
-
-            showToast("Removed from bag");
-        });
-    });
-
-    const subtotal = bag.reduce(
-        (sum, item) => sum + Number(item.price) * Number(item.quantity),
-        0
-    );
-
-    cartSubtotal.textContent = formatPrice(subtotal);
-    cartDelivery.textContent = subtotal >= 999 ? "FREE" : "₹99";
-
-    document.getElementById("cartTotal").textContent =
-        formatPrice(subtotal >= 999 ? subtotal : subtotal + 99);
-}
-
-function openCart() {
-    cartOverlay.classList.add("show");
-    cartDrawer.classList.add("open");
-    document.body.style.overflow = "hidden";
-}
-
-function closeCart() {
-    cartOverlay.classList.remove("show");
-    cartDrawer.classList.remove("open");
-
-    if (
-        !wishlistDrawer.classList.contains("open") &&
-        !quickModal.classList.contains("show") &&
-        !checkoutModal.classList.contains("open") &&
-        !orderHistoryDrawer.classList.contains("open")
-    ) {
-        document.body.style.overflow = "";
-    }
-}
-
-function openQuickView(product) {
-    modalProduct = product;
-
-    modalImage.src = product.dataset.image;
-    modalBrand.textContent = product.dataset.brand;
-    modalName.textContent = product.dataset.name;
-
-    modalDescription.textContent =
-        "A premium pick selected for your wardrobe. Designed for everyday styling with a modern, effortless finish.";
-
-    modalPrice.textContent = formatPrice(product.dataset.price);
-
+function openQuickView(card) {
+    quickProduct = getProduct(card);
+    quickQuantity = 1;
+    quickSelectedSize = "";
+
+    modalImage.src = quickProduct.image;
+    modalBrand.textContent = quickProduct.brand;
+    modalName.textContent = quickProduct.name;
+    modalDescription.textContent = "Premium selected fashion piece designed for everyday comfort, style and effortless looks.";
+    modalPrice.textContent = money(quickProduct.price);
     modalQty.textContent = "1";
-    modalSelectedSize = "";
 
-    const sizes = [
-        ...product.querySelectorAll(".size-row button")
-    ];
+    const sizes = [...card.querySelectorAll(".size-row button")].map(button => button.textContent);
 
-    modalSizes.innerHTML = sizes.map(button => `
-        <button type="button" data-size="${button.textContent.trim()}">
-            ${button.textContent.trim()}
-        </button>
+    modalSizes.innerHTML = sizes.map(size => `
+        <button onclick="selectQuickSize(this,'${size}')">${size}</button>
     `).join("");
-
-    modalSizes.querySelectorAll("button").forEach(button => {
-        button.addEventListener("click", () => {
-            modalSizes
-                .querySelectorAll("button")
-                .forEach(item => item.classList.remove("selected"));
-
-            button.classList.add("selected");
-            modalSelectedSize = button.dataset.size;
-        });
-    });
 
     quickModal.classList.add("show");
     document.body.style.overflow = "hidden";
+}
+
+function selectQuickSize(button, size) {
+    $$("#modalSizes button").forEach(item => item.classList.remove("active"));
+    button.classList.add("active");
+    quickSelectedSize = size;
 }
 
 function closeQuickView() {
@@ -557,469 +504,56 @@ function closeQuickView() {
         !cartDrawer.classList.contains("open") &&
         !wishlistDrawer.classList.contains("open") &&
         !checkoutModal.classList.contains("open") &&
-        !orderHistoryDrawer.classList.contains("open")
+        !loginModal.classList.contains("open")
     ) {
         document.body.style.overflow = "";
     }
 }
 
-modalMinus.addEventListener("click", () => {
-    let quantity = Number(modalQty.textContent);
-    quantity = Math.max(1, quantity - 1);
-    modalQty.textContent = quantity;
-});
-
-modalPlus.addEventListener("click", () => {
-    let quantity = Number(modalQty.textContent);
-    quantity = Math.min(10, quantity + 1);
-    modalQty.textContent = quantity;
-});
-
-modalAdd.addEventListener("click", () => {
-    if (!modalProduct) {
-        return;
-    }
-
-    if (!modalSelectedSize) {
-        showToast("Please select a size");
-        return;
-    }
-
-    addToBag({
-        name: modalProduct.dataset.name,
-        brand: modalProduct.dataset.brand,
-        price: Number(modalProduct.dataset.price),
-        image: modalProduct.dataset.image,
-        size: modalSelectedSize,
-        quantity: Number(modalQty.textContent)
-    });
-
-    closeQuickView();
-});
-
-modalClose.addEventListener("click", closeQuickView);
-
-quickModal.addEventListener("click", event => {
-    if (event.target === quickModal) {
-        closeQuickView();
-    }
-});
-
-wishlistBtn.addEventListener("click", openWishlist);
-mobileWishlistBtn.addEventListener("click", openWishlist);
-wishlistClose.addEventListener("click", closeWishlist);
-wishlistOverlay.addEventListener("click", closeWishlist);
-
-bagBtn.addEventListener("click", openCart);
-mobileBagBtn.addEventListener("click", openCart);
-cartClose.addEventListener("click", closeCart);
-cartOverlay.addEventListener("click", closeCart);
-
-profileBtn.addEventListener("click", openOrderHistory);
-mobileProfileBtn.addEventListener("click", openOrderHistory);
-
-mobileHomeBtn.addEventListener("click", () => {
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-});
-
-mobileMenuBtn.addEventListener("click", () => {
-    mobileMenu.classList.toggle("show");
-});
-
-document.querySelectorAll("[data-category]").forEach(link => {
-    link.addEventListener("click", event => {
-        const category = link.dataset.category;
-
-        if (!category) {
-            return;
-        }
-
-        event.preventDefault();
-
-        filters.category = category;
-
-        document.querySelectorAll(".filter-option").forEach(button => {
-            if (button.dataset.filter === "category") {
-                button.classList.toggle(
-                    "active",
-                    button.dataset.value === category
-                );
-            }
-        });
-
-        applyFilters();
-
-        document
-            .getElementById("products")
-            .scrollIntoView({
-                behavior: "smooth"
-            });
-
-        mobileMenu.classList.remove("show");
-    });
-});
-
-clearSearch.addEventListener("click", () => {
-    searchInput.value = "";
-    clearSearch.style.display = "none";
-    applyFilters();
-});
-
-searchInput.addEventListener("input", () => {
-    clearSearch.style.display =
-        searchInput.value ? "block" : "none";
-
-    applyFilters();
-});
-
-sortSelect.addEventListener("change", applyFilters);
-
-filterToggle.addEventListener("click", () => {
-    filterPanel.classList.toggle("show");
-});
-
-document.querySelectorAll(".filter-option").forEach(button => {
-    button.addEventListener("click", () => {
-        const type = button.dataset.filter;
-        const value = button.dataset.value;
-
-        filters[type] = value;
-
-        document
-            .querySelectorAll(`.filter-option[data-filter="${type}"]`)
-            .forEach(item => {
-                item.classList.toggle(
-                    "active",
-                    item.dataset.value === value
-                );
-            });
-
-        applyFilters();
-    });
-});
-
-function matchesFilter(product) {
-    const category = product.dataset.category;
-    const price = Number(product.dataset.price);
-    const rating = Number(product.dataset.rating);
-    const discount = Number(product.dataset.discount);
-    const search = searchInput.value.trim().toLowerCase();
-
-    if (
-        search &&
-        !product.dataset.name.toLowerCase().includes(search) &&
-        !product.dataset.brand.toLowerCase().includes(search) &&
-        !category.toLowerCase().includes(search)
-    ) {
-        return false;
-    }
-
-    if (
-        filters.category !== "all" &&
-        category !== filters.category
-    ) {
-        return false;
-    }
-
-    if (
-        filters.price === "under1000" &&
-        price >= 1000
-    ) {
-        return false;
-    }
-
-    if (
-        filters.price === "1000-2000" &&
-        (price < 1000 || price > 2000)
-    ) {
-        return false;
-    }
-
-    if (
-        filters.price === "above2000" &&
-        price <= 2000
-    ) {
-        return false;
-    }
-
-    if (
-        filters.rating !== "all" &&
-        rating < Number(filters.rating)
-    ) {
-        return false;
-    }
-
-    if (
-        filters.discount !== "all" &&
-        discount < Number(filters.discount)
-    ) {
-        return false;
-    }
-
-    return true;
-}
-
-function applyFilters() {
-    const visibleProducts = products.filter(matchesFilter);
-
-    products.forEach(product => {
-        product.style.display = visibleProducts.includes(product)
-            ? ""
-            : "none";
-    });
-
-    const sortValue = sortSelect.value;
-
-    const sorted = [...visibleProducts].sort((a, b) => {
-        const priceA = Number(a.dataset.price);
-        const priceB = Number(b.dataset.price);
-        const ratingA = Number(a.dataset.rating);
-        const ratingB = Number(b.dataset.rating);
-        const discountA = Number(a.dataset.discount);
-        const discountB = Number(b.dataset.discount);
-
-        if (sortValue === "price-low") {
-            return priceA - priceB;
-        }
-
-        if (sortValue === "price-high") {
-            return priceB - priceA;
-        }
-
-        if (sortValue === "rating") {
-            return ratingB - ratingA;
-        }
-
-        if (sortValue === "discount") {
-            return discountB - discountA;
-        }
-
-        return 0;
-    });
-
-    sorted.forEach(product => {
-        document
-            .getElementById("productsGrid")
-            .appendChild(product);
-    });
-
-    resultCount.textContent = visibleProducts.length;
-
-    noResults.classList.toggle(
-        "show",
-        visibleProducts.length === 0
-    );
-
-    let count = 0;
-
-    Object.values(filters).forEach(value => {
-        if (value !== "all") {
-            count++;
-        }
-    });
-
-    if (searchInput.value.trim()) {
-        count++;
-    }
-
-    filterCount.textContent = count;
-
-    activeFilters.innerHTML = "";
-
-    Object.entries(filters).forEach(([key, value]) => {
-        if (value !== "all") {
-            const tag = document.createElement("span");
-            tag.className = "active-filter";
-            tag.textContent = `${key}: ${value}`;
-            activeFilters.appendChild(tag);
-        }
-    });
-
-    if (searchInput.value.trim()) {
-        const tag = document.createElement("span");
-        tag.className = "active-filter";
-        tag.textContent = `Search: ${searchInput.value.trim()}`;
-        activeFilters.appendChild(tag);
-    }
-}
-
-function resetAllFilters() {
-    filters.category = "all";
-    filters.price = "all";
-    filters.rating = "all";
-    filters.discount = "all";
-
-    sortSelect.value = "relevance";
-    searchInput.value = "";
-    clearSearch.style.display = "none";
-
-    document.querySelectorAll(".filter-option").forEach(button => {
-        if (button.dataset.value === "all") {
-            button.classList.add("active");
-        } else {
-            button.classList.remove("active");
-        }
-    });
-
-    applyFilters();
-}
-
-resetFilters.addEventListener("click", resetAllFilters);
-noResultsReset.addEventListener("click", resetAllFilters);
-
-const checkoutOverlay = document.getElementById("checkoutOverlay");
-const checkoutModal = document.getElementById("checkoutModal");
-const checkoutClose = document.getElementById("checkoutClose");
-const checkoutContent = document.getElementById("checkoutContent");
-const checkoutSuccess = document.getElementById("checkoutSuccess");
-const checkoutProducts = document.getElementById("checkoutProducts");
-const checkoutItemsCount = document.getElementById("checkoutItemsCount");
-const checkoutSubtotal = document.getElementById("checkoutSubtotal");
-const checkoutDiscount = document.getElementById("checkoutDiscount");
-const checkoutDelivery = document.getElementById("checkoutDelivery");
-const checkoutTotal = document.getElementById("checkoutTotal");
-const couponInput = document.getElementById("couponInput");
-const applyCoupon = document.getElementById("applyCoupon");
-const couponMessage = document.getElementById("couponMessage");
-const placeOrderBtn = document.getElementById("placeOrderBtn");
-const checkoutName = document.getElementById("checkoutName");
-const checkoutMobile = document.getElementById("checkoutMobile");
-const checkoutPin = document.getElementById("checkoutPin");
-const checkoutCity = document.getElementById("checkoutCity");
-const checkoutAddress = document.getElementById("checkoutAddress");
-const continueShoppingAfterOrder = document.getElementById("continueShoppingAfterOrder");
-const orderId = document.getElementById("orderId");
-const checkoutBtn = document.getElementById("checkoutBtn");
-
-let appliedCoupon = "";
-let checkoutDiscountValue = 0;
-let checkoutOrderSnapshot = [];
-let orderHistory = JSON.parse(localStorage.getItem("myntraOrders")) || [];
-
-function saveOrders() {
-    localStorage.setItem(
-        "myntraOrders",
-        JSON.stringify(orderHistory)
-    );
-}
-
-function calculateCheckoutTotals() {
-    const subtotal = bag.reduce(
-        (sum, item) =>
-            sum + Number(item.price) * Number(item.quantity),
-        0
-    );
-
-    checkoutDiscountValue =
-        appliedCoupon === "MYNTRA10"
-            ? Math.round(subtotal * .10)
-            : 0;
-
-    const delivery = subtotal >= 999 ? 0 : 99;
-
-    const total =
-        subtotal -
-        checkoutDiscountValue +
-        delivery;
-
-    return {
-        subtotal,
-        discount: checkoutDiscountValue,
-        delivery,
-        total
-    };
-}
-
 function renderCheckout() {
     if (!bag.length) {
+        checkoutProducts.innerHTML = "";
         return;
     }
-
-    checkoutOrderSnapshot = bag.map(item => ({
-        ...item
-    }));
-
-    const totals = calculateCheckoutTotals();
-
-    checkoutItemsCount.textContent =
-        `${bag.reduce(
-            (sum, item) => sum + Number(item.quantity),
-            0
-        )} items`;
 
     checkoutProducts.innerHTML = bag.map(item => `
         <div class="checkout-product">
-            <div class="checkout-product-image">
-                <img src="${item.image}" alt="${item.name}">
-            </div>
-
+            <img src="${item.image}" alt="${item.name}">
             <div>
-                <div class="checkout-product-brand">
-                    ${item.brand}
-                </div>
-
-                <div class="checkout-product-name">
-                    ${item.name}
-                </div>
-
-                <div class="checkout-product-meta">
-                    Size: ${item.size} · Qty: ${item.quantity}
-                </div>
+                <strong>${item.brand}</strong>
+                <span>${item.name}</span>
+                <span>Size ${item.size} · Qty ${item.quantity}</span>
             </div>
-
-            <div class="checkout-product-price">
-                ${formatPrice(
-                    Number(item.price) * Number(item.quantity)
-                )}
-            </div>
+            <div class="checkout-product-price">${money(item.price * item.quantity)}</div>
         </div>
     `).join("");
 
-    checkoutSubtotal.textContent =
-        formatPrice(totals.subtotal);
+    const itemCount = bag.reduce((sum, item) => sum + item.quantity, 0);
+    const subtotal = bag.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const delivery = subtotal >= 999 ? 0 : 99;
 
-    checkoutDiscount.textContent =
-        `- ${formatPrice(totals.discount)}`;
-
-    checkoutDelivery.textContent =
-        totals.delivery === 0
-            ? "FREE"
-            : formatPrice(totals.delivery);
-
-    checkoutTotal.textContent =
-        formatPrice(totals.total);
+    checkoutItemsCount.textContent = `${itemCount} items`;
+    checkoutSubtotal.textContent = money(subtotal);
+    checkoutDiscount.textContent = checkoutDiscountValue ? `− ${money(checkoutDiscountValue)}` : "− ₹0";
+    checkoutDelivery.textContent = delivery ? money(delivery) : "FREE";
+    checkoutTotal.textContent = money(subtotal - checkoutDiscountValue + delivery);
 }
 
 function resetCheckout() {
     appliedCoupon = "";
     checkoutDiscountValue = 0;
-    checkoutOrderSnapshot = [];
-
-    checkoutContent.style.display = "grid";
-    checkoutSuccess.classList.remove("show");
 
     couponInput.value = "";
     couponMessage.textContent = "";
-    couponMessage.className = "";
 
-    checkoutName.value = "";
-    checkoutMobile.value = "";
-    checkoutPin.value = "";
-    checkoutCity.value = "";
-    checkoutAddress.value = "";
+    checkoutSuccess.classList.remove("show");
+    checkoutContent.style.display = "grid";
 
-    document
-        .querySelectorAll('input[name="paymentMethod"]')
-        .forEach(input => {
-            input.checked = false;
-        });
+    $$("#checkoutModal input[name='paymentMethod']").forEach(input => {
+        input.checked = false;
+    });
 
-    placeOrderBtn.disabled = false;
-    placeOrderBtn.querySelector("span").textContent =
-        "Place Order";
+    renderCheckout();
 }
 
 function openCheckout() {
@@ -1028,9 +562,14 @@ function openCheckout() {
         return;
     }
 
+    if (!currentUser) {
+        closeCart();
+        openLogin(true);
+        return;
+    }
+
     closeCart();
     resetCheckout();
-    renderCheckout();
 
     checkoutOverlay.classList.add("show");
     checkoutModal.classList.add("open");
@@ -1045,102 +584,76 @@ function closeCheckout() {
     if (
         !cartDrawer.classList.contains("open") &&
         !wishlistDrawer.classList.contains("open") &&
-        !quickModal.classList.contains("show") &&
-        !orderHistoryDrawer.classList.contains("open")
+        !loginModal.classList.contains("open")
     ) {
         document.body.style.overflow = "";
     }
 }
 
 function applyCouponCode() {
-    const code = couponInput.value
-        .trim()
-        .toUpperCase();
+    const code = couponInput.value.trim().toUpperCase();
 
-    if (appliedCoupon === "MYNTRA10") {
-        couponMessage.textContent =
-            "Coupon already applied";
+    if (code === "MYNTRA10") {
+        const subtotal = bag.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-        couponMessage.className = "error";
+        if (subtotal < 500) {
+            couponMessage.textContent = "Minimum order value is ₹500.";
+            couponMessage.style.color = "#e33";
+            return;
+        }
+
+        appliedCoupon = code;
+        checkoutDiscountValue = Math.round(subtotal * 0.1);
+
+        couponMessage.textContent = "10% discount applied successfully.";
+        couponMessage.style.color = "#168d35";
+
+        renderCheckout();
         return;
     }
 
-    if (code !== "MYNTRA10") {
-        couponMessage.textContent =
-            "Invalid coupon code";
-
-        couponMessage.className = "error";
-        return;
-    }
-
-    appliedCoupon = "MYNTRA10";
-
-    couponInput.value = "MYNTRA10";
-
-    couponMessage.textContent =
-        "10% discount applied";
-
-    couponMessage.className = "success";
-
+    appliedCoupon = "";
+    checkoutDiscountValue = 0;
+    couponMessage.textContent = "Invalid coupon code.";
+    couponMessage.style.color = "#e33";
     renderCheckout();
 }
 
-function validateCheckoutForm() {
-    const name = checkoutName.value.trim();
-    const mobile = checkoutMobile.value.trim();
-    const pin = checkoutPin.value.trim();
-    const city = checkoutCity.value.trim();
-    const address = checkoutAddress.value.trim();
-
-    const payment =
-        document.querySelector(
-            'input[name="paymentMethod"]:checked'
-        );
-
-    if (name.length < 2) {
-        showToast("Please enter your full name");
+function validateCheckout() {
+    if (!checkoutName.value.trim()) {
+        showToast("Enter your full name");
         checkoutName.focus();
         return false;
     }
 
-    if (!/^[6-9]\d{9}$/.test(mobile)) {
-        showToast(
-            "Enter a valid 10-digit mobile number"
-        );
-
+    if (!/^\d{10}$/.test(checkoutMobile.value.trim())) {
+        showToast("Enter a valid 10-digit mobile number");
         checkoutMobile.focus();
         return false;
     }
 
-    if (!/^\d{6}$/.test(pin)) {
-        showToast(
-            "Enter a valid 6-digit PIN code"
-        );
-
+    if (!/^\d{6}$/.test(checkoutPin.value.trim())) {
+        showToast("Enter a valid 6-digit PIN code");
         checkoutPin.focus();
         return false;
     }
 
-    if (city.length < 2) {
-        showToast("Please enter your city");
+    if (!checkoutCity.value.trim()) {
+        showToast("Enter your city");
         checkoutCity.focus();
         return false;
     }
 
-    if (address.length < 8) {
-        showToast(
-            "Please enter your complete address"
-        );
-
+    if (!checkoutAddress.value.trim()) {
+        showToast("Enter your complete address");
         checkoutAddress.focus();
         return false;
     }
 
-    if (!payment) {
-        showToast(
-            "Please select a payment method"
-        );
+    const payment = document.querySelector("input[name='paymentMethod']:checked");
 
+    if (!payment) {
+        showToast("Select a payment method");
         return false;
     }
 
@@ -1148,453 +661,545 @@ function validateCheckoutForm() {
 }
 
 function createOrderRecord() {
-    const totals = calculateCheckoutTotals();
+    const subtotal = bag.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const delivery = subtotal >= 999 ? 0 : 99;
+    const total = subtotal - checkoutDiscountValue + delivery;
 
     return {
         id: `MYN${Date.now().toString().slice(-8)}`,
-        date: new Date().toISOString(),
-        status: "CONFIRMED",
-        paymentMethod:
-            document.querySelector(
-                'input[name="paymentMethod"]:checked'
-            )?.value || "COD",
-
+        date: new Date().toLocaleDateString("en-IN", {
+            day:"2-digit",
+            month:"short",
+            year:"numeric"
+        }),
+        userEmail: currentUser.email,
+        items: JSON.parse(JSON.stringify(bag)),
+        subtotal,
+        discount: checkoutDiscountValue,
+        delivery,
+        total,
+        payment: document.querySelector("input[name='paymentMethod']:checked").value,
         customer: {
             name: checkoutName.value.trim(),
             mobile: checkoutMobile.value.trim(),
             pin: checkoutPin.value.trim(),
             city: checkoutCity.value.trim(),
             address: checkoutAddress.value.trim()
-        },
-
-        items: checkoutOrderSnapshot.map(item => ({
-            name: item.name,
-            brand: item.brand,
-            price: Number(item.price),
-            image: item.image,
-            size: item.size,
-            quantity: Number(item.quantity)
-        })),
-
-        subtotal: totals.subtotal,
-        discount: totals.discount,
-        delivery: totals.delivery,
-        total: totals.total
+        }
     };
 }
 
 function placeOrder() {
-    if (!validateCheckoutForm()) {
+    if (!currentUser) {
+        closeCheckout();
+        openLogin(true);
+        return;
+    }
+
+    if (!validateCheckout()) {
         return;
     }
 
     const order = createOrderRecord();
 
-    placeOrderBtn.disabled = true;
+    orderHistory.unshift(order);
+    saveOrders();
 
-    placeOrderBtn.querySelector("span").textContent =
-        "Placing Order...";
+    successOrderId.textContent = order.id;
 
-    setTimeout(() => {
-        orderHistory.unshift(order);
+    bag = [];
+    saveBag();
+    updateCounts();
+    renderCart();
 
-        saveOrders();
+    checkoutContent.style.display = "none";
+    checkoutSuccess.classList.add("show");
 
-        bag = [];
-
-        saveData();
-        updateBagCount();
-        renderCart();
-
-        orderId.textContent = order.id;
-
-        checkoutContent.style.display = "none";
-        checkoutSuccess.classList.add("show");
-
-        checkoutModal.scrollTop = 0;
-
-        placeOrderBtn.disabled = false;
-
-        placeOrderBtn.querySelector("span").textContent =
-            "Place Order";
-
-        showToast("Order placed successfully");
-    }, 700);
-}
-
-function continueShoppingFromOrder() {
-    checkoutSuccess.classList.remove("show");
-    checkoutContent.style.display = "grid";
-
-    closeCheckout();
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
-
-function formatOrderDate(date) {
-    return new Date(date).toLocaleDateString(
-        "en-IN",
-        {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        }
-    );
+    showToast("Order placed successfully");
 }
 
 function renderOrderHistory() {
-    if (!orderHistory.length) {
+    const visibleOrders = orderHistory.filter(order =>
+        !order.userEmail || order.userEmail === currentUser.email
+    );
+
+    if (!visibleOrders.length) {
         orderHistoryBody.innerHTML = `
-            <div class="order-history-empty">
-                <div class="order-history-empty-inner">
+            <div class="empty-state">
+                <div>
                     <i class="fa-solid fa-box-open"></i>
                     <h3>No orders yet</h3>
-                    <p>
-                        Your completed orders will appear here
-                        with tracking details and order information.
-                    </p>
-
-                    <button
-                        type="button"
-                        id="startShoppingFromOrders"
-                    >
-                        START SHOPPING
-                    </button>
+                    <p>Your placed orders will appear here.</p>
                 </div>
             </div>
         `;
-
-        document
-            .getElementById("startShoppingFromOrders")
-            .addEventListener(
-                "click",
-                closeOrderHistory
-            );
-
         return;
     }
 
-    orderHistoryBody.innerHTML =
-        orderHistory.map((order, index) => `
-            <article class="order-card">
+    orderHistoryBody.innerHTML = visibleOrders.map((order, index) => `
+        <article class="order-card">
+            <div class="order-card-top">
+                <div>
+                    <div class="order-card-id">${order.id}</div>
+                    <div class="order-card-date">${order.date}</div>
+                </div>
+                <span class="order-status">CONFIRMED</span>
+            </div>
 
-                <div class="order-card-top">
+            <div class="order-items">
+                ${order.items.map(item => `
+                    <div class="order-item">
+                        <img class="order-item-image" src="${item.image}" alt="${item.name}">
+                        <div>
+                            <strong>${item.brand}</strong>
+                            <span>${item.name}</span>
+                            <span>Size ${item.size} · Qty ${item.quantity}</span>
+                        </div>
+                        <div class="order-item-price">${money(item.price * item.quantity)}</div>
+                    </div>
+                `).join("")}
+            </div>
+
+            <div class="order-meta">
+                <div>
+                    <span>Total</span>
+                    <strong>${money(order.total)}</strong>
+                </div>
+                <div>
+                    <span>Payment</span>
+                    <strong>${order.payment}</strong>
+                </div>
+                <div>
+                    <span>Delivery</span>
+                    <strong>3–5 Days</strong>
+                </div>
+            </div>
+
+            <button class="track-order-btn" data-order-index="${index}">
+                TRACK ORDER
+            </button>
+
+            <div class="tracking" id="tracking-${index}">
+                <div class="tracking-step completed">
+                    <div class="tracking-dot"><i class="fa-solid fa-check"></i></div>
                     <div>
-                        <div class="order-card-id">
-                            ${order.id}
-                        </div>
-
-                        <div class="order-card-date">
-                            ${formatOrderDate(order.date)}
-                        </div>
+                        <strong>Order Confirmed</strong>
+                        <span>Your order has been confirmed.</span>
                     </div>
-
-                    <span class="order-status">
-                        ${order.status}
-                    </span>
                 </div>
 
-                <div class="order-items">
-
-                    ${order.items.map(item => `
-                        <div class="order-item">
-
-                            <div class="order-item-image">
-                                <img
-                                    src="${item.image}"
-                                    alt="${item.name}"
-                                >
-                            </div>
-
-                            <div>
-                                <div class="order-item-brand">
-                                    ${item.brand}
-                                </div>
-
-                                <div class="order-item-name">
-                                    ${item.name}
-                                </div>
-
-                                <div class="order-item-meta">
-                                    Size: ${item.size}
-                                    · Qty: ${item.quantity}
-                                </div>
-                            </div>
-
-                            <div class="order-item-price">
-                                ${formatPrice(
-                                    item.price *
-                                    item.quantity
-                                )}
-                            </div>
-
-                        </div>
-                    `).join("")}
-
-                </div>
-
-                <div class="order-card-bottom">
-
+                <div class="tracking-step completed">
+                    <div class="tracking-dot"><i class="fa-solid fa-box"></i></div>
                     <div>
-                        <span class="order-total-label">
-                            TOTAL PAID
-                        </span>
-
-                        <strong class="order-total">
-                            ${formatPrice(order.total)}
-                        </strong>
+                        <strong>Preparing for Dispatch</strong>
+                        <span>Your items are being packed.</span>
                     </div>
-
-                    <button
-                        type="button"
-                        class="track-order-btn"
-                        data-order-index="${index}"
-                    >
-                        TRACK ORDER
-                    </button>
-
                 </div>
 
-                <div
-                    class="order-tracking"
-                    id="tracking-${index}"
-                >
-
-                    <div class="tracking-title">
-                        Order Status
+                <div class="tracking-step">
+                    <div class="tracking-dot"><i class="fa-solid fa-truck"></i></div>
+                    <div>
+                        <strong>Out for Delivery</strong>
+                        <span>Expected within 3–5 business days.</span>
                     </div>
-
-                    <div class="tracking-step completed">
-                        <div class="tracking-dot">
-                            <i class="fa-solid fa-check"></i>
-                        </div>
-
-                        <div>
-                            <strong>
-                                Order Confirmed
-                            </strong>
-
-                            <span>
-                                Your order has been confirmed.
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="tracking-step completed">
-                        <div class="tracking-dot">
-                            <i class="fa-solid fa-check"></i>
-                        </div>
-
-                        <div>
-                            <strong>
-                                Preparing for Dispatch
-                            </strong>
-
-                            <span>
-                                Your items are being packed.
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="tracking-step">
-                        <div class="tracking-dot">
-                            <i class="fa-solid fa-truck"></i>
-                        </div>
-
-                        <div>
-                            <strong>
-                                Out for Delivery
-                            </strong>
-
-                            <span>
-                                Expected within 3–5 business days.
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="tracking-step">
-                        <div class="tracking-dot">
-                            <i class="fa-solid fa-house"></i>
-                        </div>
-
-                        <div>
-                            <strong>
-                                Delivered
-                            </strong>
-
-                            <span>
-                                Your order will arrive at your address.
-                            </span>
-                        </div>
-                    </div>
-
                 </div>
 
-            </article>
-        `).join("");
+                <div class="tracking-step">
+                    <div class="tracking-dot"><i class="fa-solid fa-house"></i></div>
+                    <div>
+                        <strong>Delivered</strong>
+                        <span>Your order will arrive at your address.</span>
+                    </div>
+                </div>
+            </div>
+        </article>
+    `).join("");
 
-    orderHistoryBody
-        .querySelectorAll(".track-order-btn")
-        .forEach(button => {
-
-            button.addEventListener("click", () => {
-                const tracking =
-                    document.getElementById(
-                        `tracking-${button.dataset.orderIndex}`
-                    );
-
-                tracking.classList.toggle("show");
-
-                button.textContent =
-                    tracking.classList.contains("show")
-                        ? "HIDE TRACKING"
-                        : "TRACK ORDER";
-            });
+    $$(".track-order-btn").forEach(button => {
+        button.addEventListener("click", () => {
+            const tracking = document.getElementById(`tracking-${button.dataset.orderIndex}`);
+            tracking.classList.toggle("show");
+            button.textContent = tracking.classList.contains("show")
+                ? "HIDE TRACKING"
+                : "TRACK ORDER";
         });
+    });
 }
 
-const orderHistoryOverlay =
-    document.createElement("div");
+const orderHistoryOverlay = document.createElement("div");
+orderHistoryOverlay.className = "order-history-overlay";
+document.body.appendChild(orderHistoryOverlay);
 
-orderHistoryOverlay.className =
-    "order-history-overlay";
-
-orderHistoryOverlay.id =
-    "orderHistoryOverlay";
-
-document.body.appendChild(
-    orderHistoryOverlay
-);
-
-const orderHistoryDrawer =
-    document.createElement("aside");
-
-orderHistoryDrawer.className =
-    "order-history-drawer";
-
-orderHistoryDrawer.id =
-    "orderHistoryDrawer";
+const orderHistoryDrawer = document.createElement("aside");
+orderHistoryDrawer.className = "order-history-drawer";
 
 orderHistoryDrawer.innerHTML = `
     <div class="order-history-header">
-
         <div>
-            <span class="section-label">
-                YOUR SHOPPING JOURNEY
-            </span>
-
+            <span class="section-label">YOUR SHOPPING JOURNEY</span>
             <h2>My Orders</h2>
         </div>
 
-        <button
-            type="button"
-            class="order-history-close"
-            id="orderHistoryClose"
-        >
-            <i class="fa-solid fa-xmark"></i>
+        <button class="order-logout" id="orderLogout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Logout
         </button>
 
+        <button class="order-history-close" id="orderHistoryClose">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
     </div>
 
-    <div
-        class="order-history-body"
-        id="orderHistoryBody"
-    ></div>
+    <div class="order-history-body" id="orderHistoryBody"></div>
 `;
 
-document.body.appendChild(
-    orderHistoryDrawer
-);
+document.body.appendChild(orderHistoryDrawer);
 
-const orderHistoryClose =
-    document.getElementById(
-        "orderHistoryClose"
-    );
-
-const orderHistoryBody =
-    document.getElementById(
-        "orderHistoryBody"
-    );
+const orderHistoryClose = $("#orderHistoryClose");
+const orderHistoryBody = $("#orderHistoryBody");
+const orderLogout = $("#orderLogout");
 
 function openOrderHistory() {
+    if (!currentUser) {
+        openLogin(false);
+        return;
+    }
+
     renderOrderHistory();
-
     orderHistoryOverlay.classList.add("show");
-
     orderHistoryDrawer.classList.add("open");
-
     document.body.style.overflow = "hidden";
 }
 
 function closeOrderHistory() {
     orderHistoryOverlay.classList.remove("show");
-
     orderHistoryDrawer.classList.remove("open");
 
     if (
         !cartDrawer.classList.contains("open") &&
         !wishlistDrawer.classList.contains("open") &&
-        !quickModal.classList.contains("show") &&
-        !checkoutModal.classList.contains("open")
+        !checkoutModal.classList.contains("open") &&
+        !loginModal.classList.contains("open")
     ) {
         document.body.style.overflow = "";
     }
 }
 
-checkoutBtn.addEventListener(
-    "click",
-    openCheckout
-);
+function applyFilters() {
+    const search = searchInput.value.trim().toLowerCase();
 
-checkoutClose.addEventListener(
-    "click",
-    closeCheckout
-);
+    let cards = $$(".product-card");
 
-checkoutOverlay.addEventListener(
-    "click",
-    closeCheckout
-);
+    cards.forEach(card => {
+        const product = getProduct(card);
 
-applyCoupon.addEventListener(
-    "click",
-    applyCouponCode
-);
+        let visible = true;
 
-couponInput.addEventListener(
-    "keydown",
-    event => {
-        if (event.key === "Enter") {
-            applyCouponCode();
+        if (
+            currentFilters.category !== "all" &&
+            product.category !== currentFilters.category
+        ) {
+            visible = false;
         }
+
+        if (currentFilters.price === "under1000" && product.price >= 1000) {
+            visible = false;
+        }
+
+        if (
+            currentFilters.price === "1000-2000" &&
+            (product.price < 1000 || product.price > 2000)
+        ) {
+            visible = false;
+        }
+
+        if (currentFilters.price === "above2000" && product.price <= 2000) {
+            visible = false;
+        }
+
+        if (
+            currentFilters.rating !== "all" &&
+            product.rating < Number(currentFilters.rating)
+        ) {
+            visible = false;
+        }
+
+        if (
+            currentFilters.discount !== "all" &&
+            product.discount < Number(currentFilters.discount)
+        ) {
+            visible = false;
+        }
+
+        const searchable = `${product.name} ${product.brand}`.toLowerCase();
+
+        if (search && !searchable.includes(search)) {
+            visible = false;
+        }
+
+        card.style.display = visible ? "" : "none";
+    });
+
+    const visibleCards = cards.filter(card => card.style.display !== "none");
+
+    resultCount.textContent = visibleCards.length;
+    noResults.classList.toggle("show", visibleCards.length === 0);
+
+    updateFilterUI();
+}
+
+function updateFilterUI() {
+    const values = Object.values(currentFilters).filter(value => value !== "all");
+    filterCount.textContent = values.length;
+
+    $$(".filter-option").forEach(button => {
+        const type = button.dataset.filter;
+        const value = button.dataset.value;
+
+        button.classList.toggle(
+            "active",
+            currentFilters[type] === value
+        );
+    });
+
+    activeFilters.innerHTML = values.map(value => `
+        <span>${value}</span>
+    `).join("");
+}
+
+function sortProducts() {
+    const cards = $$(".product-card");
+
+    const sorted = [...cards].sort((a,b) => {
+        const A = getProduct(a);
+        const B = getProduct(b);
+
+        if (sortSelect.value === "price-low") {
+            return A.price - B.price;
+        }
+
+        if (sortSelect.value === "price-high") {
+            return B.price - A.price;
+        }
+
+        if (sortSelect.value === "rating") {
+            return B.rating - A.rating;
+        }
+
+        if (sortSelect.value === "discount") {
+            return B.discount - A.discount;
+        }
+
+        return 0;
+    });
+
+    sorted.forEach(card => productsGrid.appendChild(card));
+    applyFilters();
+}
+
+function resetAllFilters() {
+    currentFilters = {
+        category:"all",
+        price:"all",
+        rating:"all",
+        discount:"all"
+    };
+
+    searchInput.value = "";
+    sortSelect.value = "relevance";
+
+    applyFilters();
+}
+
+$$(".filter-option").forEach(button => {
+    button.addEventListener("click", () => {
+        currentFilters[button.dataset.filter] = button.dataset.value;
+        applyFilters();
+    });
+});
+
+filterToggle.addEventListener("click", () => {
+    filterPanel.classList.toggle("open");
+});
+
+resetFilters.addEventListener("click", resetAllFilters);
+noResultsReset.addEventListener("click", resetAllFilters);
+
+sortSelect.addEventListener("change", sortProducts);
+
+searchInput.addEventListener("input", applyFilters);
+
+clearSearch.addEventListener("click", () => {
+    searchInput.value = "";
+    applyFilters();
+    searchInput.focus();
+});
+
+$$(".desktop-nav a, .mobile-menu a, .vibe-card, .occasion-card").forEach(link => {
+    link.addEventListener("click", event => {
+        const category = link.dataset.category;
+
+        if (category) {
+            currentFilters.category = category;
+            applyFilters();
+        }
+
+        mobileMenu.classList.remove("show");
+    });
+});
+
+$$(".product-card").forEach(card => {
+    card.querySelector(".wishlist-product").addEventListener("click", () => {
+        toggleWishlist(getProduct(card));
+    });
+
+    card.querySelector(".quick-view").addEventListener("click", () => {
+        openQuickView(card);
+    });
+
+    card.querySelectorAll(".size-row button").forEach(button => {
+        button.addEventListener("click", () => {
+            card.querySelectorAll(".size-row button").forEach(item => {
+                item.classList.remove("active");
+            });
+
+            button.classList.add("active");
+        });
+    });
+
+    const minus = card.querySelector(".qty-minus");
+    const plus = card.querySelector(".qty-plus");
+    const quantity = card.querySelector(".qty-value");
+
+    minus.addEventListener("click", () => {
+        const value = Math.max(1, Number(quantity.textContent) - 1);
+        quantity.textContent = value;
+    });
+
+    plus.addEventListener("click", () => {
+        quantity.textContent = Number(quantity.textContent) + 1;
+    });
+
+    card.querySelector(".add-bag").addEventListener("click", () => {
+        const selectedSize = card.querySelector(".size-row button.active");
+        const size = selectedSize ? selectedSize.textContent : card.querySelector(".size-row button").textContent;
+        const quantityValue = Number(quantity.textContent);
+
+        addToBag(getProduct(card), size, quantityValue);
+        quantity.textContent = "1";
+    });
+});
+
+wishlistBtn.addEventListener("click", openWishlist);
+wishlistClose.addEventListener("click", closeWishlist);
+wishlistOverlay.addEventListener("click", closeWishlist);
+
+bagBtn.addEventListener("click", openCart);
+cartClose.addEventListener("click", closeCart);
+cartOverlay.addEventListener("click", closeCart);
+
+checkoutBtn.addEventListener("click", openCheckout);
+checkoutClose.addEventListener("click", closeCheckout);
+checkoutOverlay.addEventListener("click", closeCheckout);
+
+applyCoupon.addEventListener("click", applyCouponCode);
+
+couponInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        applyCouponCode();
     }
-);
+});
 
-placeOrderBtn.addEventListener(
-    "click",
-    placeOrder
-);
+placeOrderBtn.addEventListener("click", placeOrder);
 
-continueShoppingAfterOrder.addEventListener(
-    "click",
-    continueShoppingFromOrder
-);
+continueShopping.addEventListener("click", () => {
+    closeCheckout();
+    window.location.hash = "products";
+});
 
-orderHistoryClose.addEventListener(
-    "click",
-    closeOrderHistory
-);
+modalClose.addEventListener("click", closeQuickView);
 
-orderHistoryOverlay.addEventListener(
-    "click",
-    closeOrderHistory
-);
+quickModal.addEventListener("click", event => {
+    if (event.target === quickModal) {
+        closeQuickView();
+    }
+});
+
+modalMinus.addEventListener("click", () => {
+    quickQuantity = Math.max(1, quickQuantity - 1);
+    modalQty.textContent = quickQuantity;
+});
+
+modalPlus.addEventListener("click", () => {
+    quickQuantity++;
+    modalQty.textContent = quickQuantity;
+});
+
+modalAdd.addEventListener("click", () => {
+    if (!quickSelectedSize) {
+        showToast("Please select a size");
+        return;
+    }
+
+    addToBag(quickProduct, quickSelectedSize, quickQuantity);
+    closeQuickView();
+});
+
+profileBtn.addEventListener("click", () => {
+    if (currentUser) {
+        openOrderHistory();
+    } else {
+        openLogin(false);
+    }
+});
+
+mobileProfileBtn.addEventListener("click", () => {
+    if (currentUser) {
+        openOrderHistory();
+    } else {
+        openLogin(false);
+    }
+});
+
+mobileHomeBtn.addEventListener("click", () => {
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+});
+
+mobileWishlistBtn.addEventListener("click", openWishlist);
+mobileBagBtn.addEventListener("click", openCart);
+
+loginClose.addEventListener("click", closeLogin);
+loginOverlay.addEventListener("click", closeLogin);
+
+loginForm.addEventListener("submit", event => {
+    event.preventDefault();
+    loginUser();
+});
+
+togglePassword.addEventListener("click", () => {
+    const hidden = loginPassword.type === "password";
+
+    loginPassword.type = hidden ? "text" : "password";
+
+    togglePassword.innerHTML = hidden
+        ? '<i class="fa-regular fa-eye-slash"></i>'
+        : '<i class="fa-regular fa-eye"></i>';
+});
+
+orderLogout.addEventListener("click", logoutUser);
+orderHistoryClose.addEventListener("click", closeOrderHistory);
+orderHistoryOverlay.addEventListener("click", closeOrderHistory);
+
+mobileMenuBtn.addEventListener("click", () => {
+    mobileMenu.classList.toggle("show");
+});
 
 document.addEventListener("keydown", event => {
     if (event.key === "Escape") {
+        closeLogin();
         closeQuickView();
         closeCart();
         closeWishlist();
@@ -1604,36 +1209,27 @@ document.addEventListener("keydown", event => {
     }
 });
 
-const observer = new IntersectionObserver(
-    entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add("visible");
-                observer.unobserve(entry.target);
-            }
-        });
-    },
-    {
-        threshold: .12
-    }
-);
-
-document
-    .querySelectorAll(".reveal")
-    .forEach(element => {
-        observer.observe(element);
-    });
-
 window.addEventListener("load", () => {
     setTimeout(() => {
-        document
-            .getElementById("pageLoader")
-            .classList.add("hide");
+        pageLoader.classList.add("hide");
     }, 700);
 
-    updateWishlistCount();
-    updateWishlistUI();
-    updateBagCount();
+    updateCounts();
+    updateLoginUI();
+    updateWishlistButtons();
     renderCart();
     applyFilters();
 });
+
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+        }
+    });
+}, {
+    threshold:.08
+});
+
+$$(".reveal").forEach(element => observer.observe(element));
