@@ -85,6 +85,44 @@ const loginMessage = $("#loginMessage");
 const loginSubmit = $("#loginSubmit");
 const togglePassword = $("#togglePassword");
 
+const tabLogin = $("#tabLogin");
+const tabRegister = $("#tabRegister");
+const authLabel = $("#authLabel");
+const authTitle = $("#authTitle");
+const authSubtitle = $("#authSubtitle");
+const registerForm = $("#registerForm");
+const regName = $("#regName");
+const regMobile = $("#regMobile");
+const regEmail = $("#regEmail");
+const regPassword = $("#regPassword");
+const regConfirm = $("#regConfirm");
+const registerMessage = $("#registerMessage");
+const registerSubmit = $("#registerSubmit");
+
+const accountOverlay = $("#accountOverlay");
+const accountDrawer = $("#accountDrawer");
+const accountClose = $("#accountClose");
+const accountAvatar = $("#accountAvatar");
+const accountHeadName = $("#accountHeadName");
+const accountHeadEmail = $("#accountHeadEmail");
+const accStatOrders = $("#accStatOrders");
+const accStatWishlist = $("#accStatWishlist");
+const accStatBag = $("#accStatBag");
+const accountForm = $("#accountForm");
+const accountName = $("#accountName");
+const accountMobile = $("#accountMobile");
+const accountEmail = $("#accountEmail");
+const accountAddress = $("#accountAddress");
+const accountCity = $("#accountCity");
+const accountPin = $("#accountPin");
+const accountMessage = $("#accountMessage");
+const accountOrdersBtn = $("#accountOrdersBtn");
+const accountWishlistBtn = $("#accountWishlistBtn");
+const accountBagBtn = $("#accountBagBtn");
+const accountLogoutBtn = $("#accountLogoutBtn");
+const modalRatingBox = $("#modalRatingBox");
+const modalRatingNote = $("#modalRatingNote");
+
 const mobileMenuBtn = $("#mobileMenuBtn");
 const mobileMenu = $("#mobileMenu");
 const mobileHomeBtn = $("#mobileHomeBtn");
@@ -96,6 +134,7 @@ let bag = JSON.parse(localStorage.getItem("myntraBag")) || [];
 let wishlist = JSON.parse(localStorage.getItem("myntraWishlist")) || [];
 let orderHistory = JSON.parse(localStorage.getItem("myntraOrders")) || [];
 let currentUser = JSON.parse(localStorage.getItem("myntraUser")) || null;
+let users = JSON.parse(localStorage.getItem("myntraUsers")) || [];
 
 let currentFilters = {
     category: "all",
@@ -111,6 +150,53 @@ let quickSelectedSize = "";
 let quickQuantity = 1;
 let pendingCheckout = false;
 
+function bump(...elements) {
+    elements.forEach(element => {
+        element.classList.remove("bump");
+        void element.offsetWidth;
+        element.classList.add("bump");
+    });
+}
+
+function flyToBag(source) {
+    if (!source || !source.getBoundingClientRect || typeof source.animate !== "function") {
+        return;
+    }
+
+    const target = bagBtn.offsetWidth ? bagBtn : mobileBagBtn;
+    const from = source.getBoundingClientRect();
+    const to = target.getBoundingClientRect();
+
+    if (!from.width || !to.width) {
+        return;
+    }
+
+    const ghost = document.createElement("img");
+    const size = 90;
+
+    ghost.src = source.currentSrc || source.src;
+    ghost.className = "fly-ghost";
+    ghost.style.width = `${size}px`;
+    ghost.style.height = `${size}px`;
+    ghost.style.left = `${from.left + from.width / 2 - size / 2}px`;
+    ghost.style.top = `${from.top + from.height / 2 - size / 2}px`;
+    document.body.appendChild(ghost);
+
+    const dx = to.left + to.width / 2 - (from.left + from.width / 2);
+    const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+
+    const animation = ghost.animate([
+        { transform: "translate(0,0) scale(1)", opacity: 1 },
+        { transform: `translate(${dx * 0.55}px,${dy * 0.35 - 60}px) scale(.7)`, opacity: .95, offset: .55 },
+        { transform: `translate(${dx}px,${dy}px) scale(.1)`, opacity: .2 }
+    ], { duration: 750, easing: "cubic-bezier(.55,.05,.35,1)" });
+
+    animation.onfinish = () => {
+        ghost.remove();
+        bump(target);
+    };
+}
+
 function money(value) {
     return `₹${Number(value).toLocaleString("en-IN")}`;
 }
@@ -121,6 +207,28 @@ function saveBag() {
 
 function saveWishlist() {
     localStorage.setItem("myntraWishlist", JSON.stringify(wishlist));
+}
+
+function saveUsers() {
+    localStorage.setItem("myntraUsers", JSON.stringify(users));
+}
+
+function saveSession() {
+    localStorage.setItem("myntraUser", JSON.stringify(currentUser));
+}
+
+function hashPassword(value) {
+    let hash = 5381;
+
+    for (let i = 0; i < value.length; i++) {
+        hash = ((hash << 5) + hash + value.charCodeAt(i)) | 0;
+    }
+
+    return `h${hash}`;
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 function saveOrders() {
@@ -142,6 +250,8 @@ function showToast(message) {
 }
 
 function updateCounts() {
+    const previousBag = Number(bagCount.textContent) || 0;
+    const previousWishlist = Number(wishlistCount.textContent) || 0;
     const bagTotal = bag.reduce((sum, item) => sum + item.quantity, 0);
 
     bagCount.textContent = bagTotal;
@@ -153,6 +263,14 @@ function updateCounts() {
     wishlistCount.style.display = wishlist.length ? "grid" : "none";
     mobileBagCount.style.display = bagTotal ? "grid" : "none";
     mobileWishlistCount.style.display = wishlist.length ? "grid" : "none";
+
+    if (bagTotal !== previousBag) {
+        bump(bagCount, mobileBagCount);
+    }
+
+    if (wishlist.length !== previousWishlist) {
+        bump(wishlistCount, mobileWishlistCount);
+    }
 }
 
 function updateLoginUI() {
@@ -167,14 +285,36 @@ function updateLoginUI() {
     }
 }
 
-function openLogin(showCheckout = false) {
+function showAuthTab(mode) {
+    const isRegister = mode === "register";
+
+    tabLogin.classList.toggle("active", !isRegister);
+    tabRegister.classList.toggle("active", isRegister);
+
+    loginForm.hidden = isRegister;
+    registerForm.hidden = !isRegister;
+
+    authLabel.textContent = isRegister ? "JOIN MYNTRA" : "WELCOME BACK";
+    authTitle.textContent = isRegister ? "Create your account" : "Sign in to continue";
+    authSubtitle.textContent = isRegister
+        ? "Create an account to save your details and place orders."
+        : "Login is required before placing an order.";
+
+    loginMessage.textContent = "";
+    registerMessage.textContent = "";
+
+    setTimeout(() => (isRegister ? regName : loginEmail).focus(), 100);
+}
+
+function openLogin(showCheckout = false, mode = "login") {
     pendingCheckout = showCheckout;
     loginMessage.textContent = "";
+    registerMessage.textContent = "";
+    showAuthTab(mode);
     loginModal.classList.add("open");
     loginOverlay.classList.add("show");
     document.body.style.overflow = "hidden";
 
-    setTimeout(() => loginEmail.focus(), 100);
 }
 
 function closeLogin() {
@@ -191,16 +331,38 @@ function closeLogin() {
     }
 }
 
+function startSession(user, message) {
+    currentUser = {
+        name: user.name,
+        email: user.email,
+        mobile: user.mobile || "",
+        address: user.address || "",
+        city: user.city || "",
+        pin: user.pin || ""
+    };
+
+    saveSession();
+    updateLoginUI();
+    closeLogin();
+
+    if (pendingCheckout) {
+        pendingCheckout = false;
+        setTimeout(openCheckout, 200);
+    } else {
+        showToast(message);
+    }
+}
+
 function loginUser() {
     const email = loginEmail.value.trim();
-    const password = loginPassword.value.trim();
+    const password = loginPassword.value;
 
     if (!email) {
         loginMessage.textContent = "Please enter your email.";
         return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!isValidEmail(email)) {
         loginMessage.textContent = "Please enter a valid email.";
         return;
     }
@@ -210,32 +372,92 @@ function loginUser() {
         return;
     }
 
+    const user = users.find(item => item.email.toLowerCase() === email.toLowerCase());
+
+    if (!user) {
+        loginMessage.textContent = "No account found with this email. Please create an account.";
+        return;
+    }
+
+    if (user.password !== hashPassword(password)) {
+        loginMessage.textContent = "Incorrect password. Please try again.";
+        return;
+    }
+
     loginSubmit.disabled = true;
     loginSubmit.querySelector("span").textContent = "Signing in...";
 
     setTimeout(() => {
-        currentUser = {
-            email,
-            name: email.split("@")[0]
-        };
-
-        localStorage.setItem("myntraUser", JSON.stringify(currentUser));
-
         loginSubmit.disabled = false;
         loginSubmit.querySelector("span").textContent = "Login & Continue";
 
         loginEmail.value = "";
         loginPassword.value = "";
 
-        updateLoginUI();
-        closeLogin();
+        startSession(user, `Welcome back, ${user.name.split(" ")[0]}`);
+    }, 600);
+}
 
-        if (pendingCheckout) {
-            pendingCheckout = false;
-            setTimeout(openCheckout, 200);
-        } else {
-            showToast("Welcome back to Myntra");
-        }
+function registerUser() {
+    const name = regName.value.trim();
+    const mobile = regMobile.value.trim();
+    const email = regEmail.value.trim();
+    const password = regPassword.value;
+    const confirm = regConfirm.value;
+
+    if (name.length < 2) {
+        registerMessage.textContent = "Please enter your full name.";
+        return;
+    }
+
+    if (!/^\d{10}$/.test(mobile)) {
+        registerMessage.textContent = "Enter a valid 10-digit mobile number.";
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        registerMessage.textContent = "Please enter a valid email.";
+        return;
+    }
+
+    if (password.length < 6) {
+        registerMessage.textContent = "Password must contain at least 6 characters.";
+        return;
+    }
+
+    if (password !== confirm) {
+        registerMessage.textContent = "Passwords do not match.";
+        return;
+    }
+
+    if (users.some(item => item.email.toLowerCase() === email.toLowerCase())) {
+        registerMessage.textContent = "An account with this email already exists. Please login.";
+        return;
+    }
+
+    registerSubmit.disabled = true;
+    registerSubmit.querySelector("span").textContent = "Creating account...";
+
+    setTimeout(() => {
+        const user = {
+            name,
+            mobile,
+            email,
+            password: hashPassword(password),
+            address: "",
+            city: "",
+            pin: ""
+        };
+
+        users.push(user);
+        saveUsers();
+
+        registerSubmit.disabled = false;
+        registerSubmit.querySelector("span").textContent = "Create Account";
+
+        registerForm.reset();
+
+        startSession(user, `Account created. Welcome, ${name.split(" ")[0]}`);
     }, 600);
 }
 
@@ -243,6 +465,7 @@ function logoutUser() {
     currentUser = null;
     localStorage.removeItem("myntraUser");
     closeOrderHistory();
+    closeAccount();
     updateLoginUI();
     showToast("You have been logged out");
 }
@@ -381,6 +604,15 @@ function toggleWishlist(product) {
     } else {
         wishlist.push(product);
         showToast("Added to wishlist");
+
+        const card = $$(".product-card").find(item => item.dataset.name === product.name);
+        const heart = card ? card.querySelector(".wishlist-product") : null;
+
+        if (heart) {
+            heart.classList.remove("pop");
+            void heart.offsetWidth;
+            heart.classList.add("pop");
+        }
     }
 
     saveWishlist();
@@ -436,8 +668,15 @@ function renderWishlist() {
     `).join("");
 }
 
+function getFirstSize(name) {
+    const card = $$(".product-card").find(item => item.dataset.name === name);
+    const button = card ? card.querySelector(".size-row button") : null;
+    return button ? button.textContent : "M";
+}
+
 function addWishlistToBag(index) {
-    addToBag(wishlist[index], "M", 1);
+    const item = wishlist[index];
+    addToBag(item, getFirstSize(item.name), 1);
 }
 
 function removeWishlist(index) {
@@ -480,6 +719,8 @@ function openQuickView(card) {
     modalDescription.textContent = "Premium selected fashion piece designed for everyday comfort, style and effortless looks.";
     modalPrice.textContent = money(quickProduct.price);
     modalQty.textContent = "1";
+    modalRatingBox.innerHTML = `${quickProduct.rating} <i class="fa-solid fa-star"></i>`;
+    modalRatingNote.textContent = quickProduct.discount ? `${quickProduct.discount}% off · Highly rated` : "Highly rated product";
 
     const sizes = [...card.querySelectorAll(".size-row button")].map(button => button.textContent);
 
@@ -570,6 +811,7 @@ function openCheckout() {
 
     closeCart();
     resetCheckout();
+    prefillCheckout();
 
     checkoutOverlay.classList.add("show");
     checkoutModal.classList.add("open");
@@ -587,6 +829,41 @@ function closeCheckout() {
         !loginModal.classList.contains("open")
     ) {
         document.body.style.overflow = "";
+    }
+}
+
+function prefillCheckout() {
+    if (!currentUser) {
+        return;
+    }
+
+    checkoutName.value = currentUser.name || "";
+    checkoutMobile.value = currentUser.mobile || "";
+    checkoutAddress.value = currentUser.address || "";
+    checkoutCity.value = currentUser.city || "";
+    checkoutPin.value = currentUser.pin || "";
+}
+
+function rememberAddress(customer) {
+    currentUser = {
+        ...currentUser,
+        name: currentUser.name || customer.name,
+        mobile: currentUser.mobile || customer.mobile,
+        address: customer.address,
+        city: customer.city,
+        pin: customer.pin
+    };
+
+    saveSession();
+
+    const record = users.find(item => item.email.toLowerCase() === currentUser.email.toLowerCase());
+
+    if (record) {
+        record.mobile = currentUser.mobile;
+        record.address = currentUser.address;
+        record.city = currentUser.city;
+        record.pin = currentUser.pin;
+        saveUsers();
     }
 }
 
@@ -667,6 +944,7 @@ function createOrderRecord() {
 
     return {
         id: `MYN${Date.now().toString().slice(-8)}`,
+        placedAt: Date.now(),
         date: new Date().toLocaleDateString("en-IN", {
             day:"2-digit",
             month:"short",
@@ -704,6 +982,7 @@ function placeOrder() {
 
     orderHistory.unshift(order);
     saveOrders();
+    rememberAddress(order.customer);
 
     successOrderId.textContent = order.id;
 
@@ -885,6 +1164,116 @@ function closeOrderHistory() {
     }
 }
 
+function getUserOrders() {
+    if (!currentUser) {
+        return [];
+    }
+
+    return orderHistory.filter(order => !order.userEmail || order.userEmail === currentUser.email);
+}
+
+function renderAccount() {
+    if (!currentUser) {
+        return;
+    }
+
+    const name = currentUser.name || currentUser.email.split("@")[0];
+
+    accountAvatar.textContent = name.trim().charAt(0).toUpperCase();
+    accountHeadName.textContent = name;
+    accountHeadEmail.textContent = currentUser.email;
+
+    accStatOrders.textContent = getUserOrders().length;
+    accStatWishlist.textContent = wishlist.length;
+    accStatBag.textContent = bag.reduce((sum, item) => sum + item.quantity, 0);
+
+    accountName.value = name;
+    accountMobile.value = currentUser.mobile || "";
+    accountEmail.value = currentUser.email;
+    accountAddress.value = currentUser.address || "";
+    accountCity.value = currentUser.city || "";
+    accountPin.value = currentUser.pin || "";
+    accountMessage.textContent = "";
+}
+
+function openAccount() {
+    if (!currentUser) {
+        openLogin(false);
+        return;
+    }
+
+    renderAccount();
+    accountOverlay.classList.add("show");
+    accountDrawer.classList.add("open");
+    document.body.style.overflow = "hidden";
+}
+
+function closeAccount() {
+    accountOverlay.classList.remove("show");
+    accountDrawer.classList.remove("open");
+
+    if (
+        !cartDrawer.classList.contains("open") &&
+        !wishlistDrawer.classList.contains("open") &&
+        !checkoutModal.classList.contains("open") &&
+        !loginModal.classList.contains("open") &&
+        !orderHistoryDrawer.classList.contains("open") &&
+        !quickModal.classList.contains("show")
+    ) {
+        document.body.style.overflow = "";
+    }
+}
+
+function saveAccount() {
+    const name = accountName.value.trim();
+    const mobile = accountMobile.value.trim();
+    const pin = accountPin.value.trim();
+
+    accountMessage.style.color = "#e33";
+
+    if (name.length < 2) {
+        accountMessage.textContent = "Please enter your full name.";
+        return;
+    }
+
+    if (mobile && !/^\d{10}$/.test(mobile)) {
+        accountMessage.textContent = "Enter a valid 10-digit mobile number.";
+        return;
+    }
+
+    if (pin && !/^\d{6}$/.test(pin)) {
+        accountMessage.textContent = "Enter a valid 6-digit PIN code.";
+        return;
+    }
+
+    currentUser = {
+        ...currentUser,
+        name,
+        mobile,
+        address: accountAddress.value.trim(),
+        city: accountCity.value.trim(),
+        pin
+    };
+
+    saveSession();
+
+    const record = users.find(item => item.email.toLowerCase() === currentUser.email.toLowerCase());
+
+    if (record) {
+        record.name = currentUser.name;
+        record.mobile = currentUser.mobile;
+        record.address = currentUser.address;
+        record.city = currentUser.city;
+        record.pin = currentUser.pin;
+        saveUsers();
+    }
+
+    renderAccount();
+    accountMessage.style.color = "#168d35";
+    accountMessage.textContent = "Your details have been saved.";
+    showToast("Profile updated");
+}
+
 function applyFilters() {
     const search = searchInput.value.trim().toLowerCase();
 
@@ -931,13 +1320,21 @@ function applyFilters() {
             visible = false;
         }
 
-        const searchable = `${product.name} ${product.brand}`.toLowerCase();
+        const searchable = `${product.name} ${product.brand} ${product.category}`.toLowerCase();
 
         if (search && !searchable.includes(search)) {
             visible = false;
         }
 
+        const wasHidden = card.style.display === "none";
+
         card.style.display = visible ? "" : "none";
+
+        if (visible && wasHidden) {
+            card.classList.remove("refresh");
+            void card.offsetWidth;
+            card.classList.add("refresh");
+        }
     });
 
     const visibleCards = cards.filter(card => card.style.display !== "none");
@@ -962,9 +1359,13 @@ function updateFilterUI() {
         );
     });
 
-    activeFilters.innerHTML = values.map(value => `
-        <span>${value}</span>
-    `).join("");
+    activeFilters.innerHTML = Object.entries(currentFilters)
+        .filter(([, value]) => value !== "all")
+        .map(([type, value]) => {
+            const option = document.querySelector(`.filter-option[data-filter="${type}"][data-value="${value}"]`);
+            return `<span>${option ? option.textContent.trim() : value}</span>`;
+        })
+        .join("");
 }
 
 function sortProducts() {
@@ -990,8 +1391,12 @@ function sortProducts() {
             return B.discount - A.discount;
         }
 
-        return 0;
+        return Number(a.dataset.order) - Number(b.dataset.order);
     });
+
+    productsGrid.classList.remove("regrid");
+    void productsGrid.offsetWidth;
+    productsGrid.classList.add("regrid");
 
     sorted.forEach(card => productsGrid.appendChild(card));
     applyFilters();
@@ -1008,7 +1413,7 @@ function resetAllFilters() {
     searchInput.value = "";
     sortSelect.value = "relevance";
 
-    applyFilters();
+    sortProducts();
 }
 
 $$(".filter-option").forEach(button => {
@@ -1035,7 +1440,7 @@ clearSearch.addEventListener("click", () => {
     searchInput.focus();
 });
 
-$$(".desktop-nav a, .mobile-menu a, .vibe-card, .occasion-card").forEach(link => {
+$$(".desktop-nav a, .mobile-menu a, .vibe-card, .occasion-card, .footer a[data-category]").forEach(link => {
     link.addEventListener("click", event => {
         const category = link.dataset.category;
 
@@ -1048,7 +1453,15 @@ $$(".desktop-nav a, .mobile-menu a, .vibe-card, .occasion-card").forEach(link =>
     });
 });
 
-$$(".product-card").forEach(card => {
+$$(".product-card").forEach((card, position) => {
+    card.dataset.order = position;
+
+    const firstSize = card.querySelector(".size-row button");
+
+    if (firstSize) {
+        firstSize.classList.add("active");
+    }
+
     card.querySelector(".wishlist-product").addEventListener("click", () => {
         toggleWishlist(getProduct(card));
     });
@@ -1085,6 +1498,7 @@ $$(".product-card").forEach(card => {
         const size = selectedSize ? selectedSize.textContent : card.querySelector(".size-row button").textContent;
         const quantityValue = Number(quantity.textContent);
 
+        flyToBag(card.querySelector(".product-image img"));
         addToBag(getProduct(card), size, quantityValue);
         quantity.textContent = "1";
     });
@@ -1141,24 +1555,44 @@ modalAdd.addEventListener("click", () => {
         return;
     }
 
+    flyToBag(modalImage);
     addToBag(quickProduct, quickSelectedSize, quickQuantity);
     closeQuickView();
 });
 
-profileBtn.addEventListener("click", () => {
-    if (currentUser) {
-        openOrderHistory();
-    } else {
-        openLogin(false);
-    }
+profileBtn.addEventListener("click", openAccount);
+mobileProfileBtn.addEventListener("click", openAccount);
+
+accountClose.addEventListener("click", closeAccount);
+accountOverlay.addEventListener("click", closeAccount);
+accountLogoutBtn.addEventListener("click", logoutUser);
+
+accountOrdersBtn.addEventListener("click", () => {
+    closeAccount();
+    openOrderHistory();
 });
 
-mobileProfileBtn.addEventListener("click", () => {
-    if (currentUser) {
-        openOrderHistory();
-    } else {
-        openLogin(false);
-    }
+accountWishlistBtn.addEventListener("click", () => {
+    closeAccount();
+    openWishlist();
+});
+
+accountBagBtn.addEventListener("click", () => {
+    closeAccount();
+    openCart();
+});
+
+accountForm.addEventListener("submit", event => {
+    event.preventDefault();
+    saveAccount();
+});
+
+tabLogin.addEventListener("click", () => showAuthTab("login"));
+tabRegister.addEventListener("click", () => showAuthTab("register"));
+
+registerForm.addEventListener("submit", event => {
+    event.preventDefault();
+    registerUser();
 });
 
 mobileHomeBtn.addEventListener("click", () => {
@@ -1194,12 +1628,30 @@ orderHistoryClose.addEventListener("click", closeOrderHistory);
 orderHistoryOverlay.addEventListener("click", closeOrderHistory);
 
 mobileMenuBtn.addEventListener("click", () => {
+    mobileMenu.style.top = `${Math.max(0, document.querySelector(".navbar").getBoundingClientRect().bottom)}px`;
     mobileMenu.classList.toggle("show");
+});
+
+document.addEventListener("click", event => {
+    if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+        mobileMenu.classList.remove("show");
+    }
+});
+
+window.addEventListener("scroll", () => {
+    mobileMenu.classList.remove("show");
+}, { passive: true });
+
+[regMobile, accountMobile, checkoutMobile, accountPin, checkoutPin].forEach(input => {
+    input.addEventListener("input", () => {
+        input.value = input.value.replace(/\D/g, "");
+    });
 });
 
 document.addEventListener("keydown", event => {
     if (event.key === "Escape") {
         closeLogin();
+        closeAccount();
         closeQuickView();
         closeCart();
         closeWishlist();
@@ -1222,10 +1674,22 @@ window.addEventListener("load", () => {
 });
 
 const observer = new IntersectionObserver(entries => {
+    let step = 0;
+
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            observer.unobserve(entry.target);
+            const target = entry.target;
+
+            if (target.classList.contains("product-card")) {
+                target.style.transitionDelay = `${step * 90}ms`;
+                step++;
+                setTimeout(() => {
+                    target.style.transitionDelay = "";
+                }, 1400);
+            }
+
+            target.classList.add("visible");
+            observer.unobserve(target);
         }
     });
 }, {
@@ -1233,3 +1697,525 @@ const observer = new IntersectionObserver(entries => {
 });
 
 $$(".reveal").forEach(element => observer.observe(element));
+
+document.body.addEventListener("animationend", event => {
+    if (event.animationName === "badgeBump" || event.animationName === "heartPop") {
+        event.target.classList.remove("bump", "pop");
+    }
+
+    if (event.animationName === "cardRefresh") {
+        event.target.classList.remove("refresh");
+    }
+});
+
+const scrollProgress = document.createElement("div");
+scrollProgress.className = "scroll-progress";
+document.body.appendChild(scrollProgress);
+
+const navbarElement = $(".navbar");
+
+function updateScrollEffects() {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const ratio = max > 0 ? Math.min(1, window.scrollY / max) : 0;
+
+    scrollProgress.style.transform = `scaleX(${ratio})`;
+    navbarElement.classList.toggle("scrolled", window.scrollY > 20);
+}
+
+window.addEventListener("scroll", updateScrollEffects, { passive: true });
+window.addEventListener("resize", updateScrollEffects);
+updateScrollEffects();
+
+function runCountUp() {
+    $$(".hero-stats strong").forEach(element => {
+        const match = element.textContent.trim().match(/^([\d.]+)(.*)$/);
+
+        if (!match) {
+            return;
+        }
+
+        const end = parseFloat(match[1]);
+        const suffix = match[2];
+        const decimals = match[1].includes(".") ? match[1].split(".")[1].length : 0;
+        const duration = 1400;
+        const startTime = performance.now();
+
+        function frame(now) {
+            const progress = Math.min(1, (now - startTime) / duration);
+            const eased = 1 - Math.pow(1 - progress, 3);
+
+            element.textContent = `${(end * eased).toFixed(decimals)}${suffix}`;
+
+            if (progress < 1) {
+                requestAnimationFrame(frame);
+            }
+        }
+
+        requestAnimationFrame(frame);
+    });
+}
+
+window.addEventListener("load", () => {
+    setTimeout(runCountUp, 1000);
+});
+
+const helpOverlay = $("#helpOverlay");
+const helpModal = $("#helpModal");
+const helpClose = $("#helpClose");
+const helpTitle = $("#helpTitle");
+const helpTitles = { contact: "Contact Us", returns: "Returns", shipping: "Shipping", faq: "FAQ" };
+
+let tickets = JSON.parse(localStorage.getItem("myntraTickets")) || [];
+let returnRequests = JSON.parse(localStorage.getItem("myntraReturns")) || [];
+
+function saveTickets() {
+    localStorage.setItem("myntraTickets", JSON.stringify(tickets));
+}
+
+function saveReturns() {
+    localStorage.setItem("myntraReturns", JSON.stringify(returnRequests));
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    }[character]));
+}
+
+function setHelpMessage(element, text, success) {
+    element.textContent = text;
+    element.style.color = success ? "#168d35" : "#e33";
+}
+
+function formatShortDate(date) {
+    return date.toLocaleDateString("en-IN", { weekday: "short", day: "2-digit", month: "short" });
+}
+
+function showHelpTab(tab) {
+    const name = helpTitles[tab] ? tab : "contact";
+
+    helpTitle.textContent = helpTitles[name];
+
+    $$(".help-tab").forEach(button => {
+        button.classList.toggle("active", button.dataset.helpTab === name);
+    });
+
+    $$(".help-panel").forEach(panel => {
+        panel.hidden = panel.dataset.helpPanel !== name;
+    });
+
+    if (name === "contact") {
+        prepareContact();
+    }
+
+    if (name === "returns") {
+        prepareReturns();
+    }
+
+    $(".help-body").scrollTop = 0;
+}
+
+function openHelp(tab) {
+    showHelpTab(tab);
+    helpOverlay.classList.add("show");
+    helpModal.classList.add("open");
+    document.body.style.overflow = "hidden";
+}
+
+function closeHelp() {
+    helpOverlay.classList.remove("show");
+    helpModal.classList.remove("open");
+
+    if (
+        !cartDrawer.classList.contains("open") &&
+        !wishlistDrawer.classList.contains("open") &&
+        !checkoutModal.classList.contains("open") &&
+        !loginModal.classList.contains("open") &&
+        !accountDrawer.classList.contains("open") &&
+        !orderHistoryDrawer.classList.contains("open") &&
+        !quickModal.classList.contains("show")
+    ) {
+        document.body.style.overflow = "";
+    }
+}
+
+function prepareContact() {
+    const name = $("#contactName");
+    const email = $("#contactEmail");
+
+    if (currentUser) {
+        if (!name.value) {
+            name.value = currentUser.name || "";
+        }
+
+        if (!email.value) {
+            email.value = currentUser.email || "";
+        }
+    }
+
+    renderTickets();
+}
+
+function renderTickets() {
+    const list = $("#ticketList");
+    const mine = currentUser ? tickets.filter(item => item.email.toLowerCase() === currentUser.email.toLowerCase()) : [];
+
+    if (!mine.length) {
+        list.innerHTML = "";
+        return;
+    }
+
+    list.innerHTML = `
+        <h3>Your recent requests</h3>
+        ${mine.slice(0, 5).map(item => `
+            <div class="help-list-item">
+                <div>
+                    <strong>${escapeHtml(item.id)} · ${escapeHtml(item.topic)}</strong>
+                    <span>${escapeHtml(item.date)}</span>
+                </div>
+                <em>${escapeHtml(item.status)}</em>
+            </div>
+        `).join("")}
+    `;
+}
+
+function submitContact() {
+    const name = $("#contactName").value.trim();
+    const email = $("#contactEmail").value.trim();
+    const topic = $("#contactTopic").value;
+    const orderId = $("#contactOrder").value.trim().toUpperCase();
+    const text = $("#contactText").value.trim();
+    const message = $("#contactMessage");
+
+    if (name.length < 2) {
+        setHelpMessage(message, "Please enter your name.", false);
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        setHelpMessage(message, "Please enter a valid email.", false);
+        return;
+    }
+
+    if (!topic) {
+        setHelpMessage(message, "Please select a topic.", false);
+        return;
+    }
+
+    if (text.length < 10) {
+        setHelpMessage(message, "Please describe your issue in at least 10 characters.", false);
+        return;
+    }
+
+    const ticket = {
+        id: `TKT${Date.now().toString().slice(-7)}`,
+        name,
+        email,
+        topic,
+        orderId,
+        message: text,
+        date: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+        status: "Open"
+    };
+
+    tickets.unshift(ticket);
+    saveTickets();
+
+    $("#contactTopic").value = "";
+    $("#contactOrder").value = "";
+    $("#contactText").value = "";
+
+    setHelpMessage(message, `Thanks ${name.split(" ")[0]}. Your request ${ticket.id} has been received. We will reply within 24 hours.`, true);
+    renderTickets();
+}
+
+function getReturnableOrders() {
+    if (!currentUser) {
+        return [];
+    }
+
+    const limit = 7 * 24 * 60 * 60 * 1000;
+
+    return orderHistory.filter(order =>
+        (!order.userEmail || order.userEmail === currentUser.email) &&
+        (!order.placedAt || Date.now() - order.placedAt <= limit)
+    );
+}
+
+function prepareReturns() {
+    const loginNote = $("#returnLoginNote");
+    const form = $("#returnForm");
+
+    loginNote.hidden = !!currentUser;
+    form.hidden = !currentUser;
+
+    if (!currentUser) {
+        $("#returnList").innerHTML = "";
+        return;
+    }
+
+    const orders = getReturnableOrders();
+    const orderSelect = $("#returnOrder");
+
+    if (!orders.length) {
+        orderSelect.innerHTML = `<option value="">No eligible orders</option>`;
+        $("#returnItem").innerHTML = `<option value="">No items available</option>`;
+    } else {
+        orderSelect.innerHTML = orders.map(order =>
+            `<option value="${escapeHtml(order.id)}">${escapeHtml(order.id)} · ${escapeHtml(order.date)} · ${money(order.total)}</option>`
+        ).join("");
+        fillReturnItems();
+    }
+
+    renderReturns();
+}
+
+function fillReturnItems() {
+    const order = orderHistory.find(item => item.id === $("#returnOrder").value);
+    const itemSelect = $("#returnItem");
+
+    if (!order) {
+        itemSelect.innerHTML = `<option value="">No items available</option>`;
+        return;
+    }
+
+    itemSelect.innerHTML = order.items.map((item, index) =>
+        `<option value="${index}">${escapeHtml(item.brand)} ${escapeHtml(item.name)} · Size ${escapeHtml(item.size)} · Qty ${item.quantity}</option>`
+    ).join("");
+}
+
+function renderReturns() {
+    const list = $("#returnList");
+    const mine = currentUser ? returnRequests.filter(item => item.userEmail === currentUser.email) : [];
+
+    if (!mine.length) {
+        list.innerHTML = "";
+        return;
+    }
+
+    list.innerHTML = `
+        <h3>Your return requests</h3>
+        ${mine.slice(0, 5).map(item => `
+            <div class="help-list-item">
+                <div>
+                    <strong>${escapeHtml(item.id)} · ${escapeHtml(item.itemName)}</strong>
+                    <span>Order ${escapeHtml(item.orderId)} · ${escapeHtml(item.reason)}</span>
+                </div>
+                <em>${escapeHtml(item.status)}</em>
+            </div>
+        `).join("")}
+    `;
+}
+
+function submitReturn() {
+    const message = $("#returnMessage");
+    const order = orderHistory.find(item => item.id === $("#returnOrder").value);
+    const reason = $("#returnReason").value;
+
+    if (!order) {
+        setHelpMessage(message, "You have no eligible orders to return.", false);
+        return;
+    }
+
+    const item = order.items[Number($("#returnItem").value)];
+
+    if (!item) {
+        setHelpMessage(message, "Please select an item.", false);
+        return;
+    }
+
+    if (!reason) {
+        setHelpMessage(message, "Please select a reason.", false);
+        return;
+    }
+
+    const duplicate = returnRequests.some(entry =>
+        entry.userEmail === currentUser.email &&
+        entry.orderId === order.id &&
+        entry.itemName === `${item.brand} ${item.name}` &&
+        entry.size === item.size
+    );
+
+    if (duplicate) {
+        setHelpMessage(message, "A return has already been requested for this item.", false);
+        return;
+    }
+
+    const request = {
+        id: `RET${Date.now().toString().slice(-7)}`,
+        orderId: order.id,
+        itemName: `${item.brand} ${item.name}`,
+        size: item.size,
+        quantity: item.quantity,
+        reason,
+        note: $("#returnNote").value.trim(),
+        userEmail: currentUser.email,
+        date: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+        status: "Requested"
+    };
+
+    returnRequests.unshift(request);
+    saveReturns();
+
+    $("#returnReason").value = "";
+    $("#returnNote").value = "";
+
+    setHelpMessage(message, `Return ${request.id} requested. Pickup will be arranged within 2 days.`, true);
+    renderReturns();
+}
+
+function checkDelivery() {
+    const pin = $("#shipPin").value.trim();
+    const result = $("#shipResult");
+
+    if (!/^\d{6}$/.test(pin)) {
+        setHelpMessage(result, "Enter a valid 6-digit PIN code.", false);
+        return;
+    }
+
+    if (pin.startsWith("0")) {
+        setHelpMessage(result, "Sorry, we do not deliver to this PIN code yet.", false);
+        return;
+    }
+
+    const from = new Date();
+    const to = new Date();
+
+    from.setDate(from.getDate() + 3);
+    to.setDate(to.getDate() + 5);
+
+    setHelpMessage(result, `Delivery available to ${pin}. Expected between ${formatShortDate(from)} and ${formatShortDate(to)}.`, true);
+}
+
+function trackOrderById() {
+    const id = $("#trackId").value.trim().toUpperCase();
+    const result = $("#trackResult");
+
+    result.style.color = "#e33";
+
+    if (!id) {
+        result.textContent = "Enter your order ID.";
+        return;
+    }
+
+    if (!currentUser) {
+        result.innerHTML = `Please login to track your order. <button type="button" class="help-inline-btn" id="trackLoginBtn">Login</button>`;
+        $("#trackLoginBtn").addEventListener("click", () => {
+            closeHelp();
+            openLogin(false);
+        });
+        return;
+    }
+
+    const order = orderHistory.find(item =>
+        item.id === id && (!item.userEmail || item.userEmail === currentUser.email)
+    );
+
+    if (!order) {
+        result.textContent = "No order found with this ID on your account.";
+        return;
+    }
+
+    const placed = order.placedAt ? new Date(order.placedAt) : null;
+    let expected = "within 3–5 business days";
+
+    if (placed) {
+        const from = new Date(placed);
+        const to = new Date(placed);
+
+        from.setDate(from.getDate() + 3);
+        to.setDate(to.getDate() + 5);
+        expected = `${formatShortDate(from)} – ${formatShortDate(to)}`;
+    }
+
+    const count = order.items.reduce((sum, item) => sum + item.quantity, 0);
+
+    result.style.color = "";
+    result.innerHTML = `
+        <div class="track-card">
+            <div><strong>${escapeHtml(order.id)}</strong><span>Placed on ${escapeHtml(order.date)}</span></div>
+            <div><strong>Status</strong><span>Confirmed · Preparing for dispatch</span></div>
+            <div><strong>Items</strong><span>${count} item${count === 1 ? "" : "s"} · ${money(order.total)}</span></div>
+            <div><strong>Expected delivery</strong><span>${expected}</span></div>
+        </div>
+    `;
+}
+
+function filterFaq() {
+    const query = $("#faqSearch").value.trim().toLowerCase();
+    let visible = 0;
+
+    $$(".faq-item").forEach(item => {
+        const match = !query || item.textContent.toLowerCase().includes(query);
+
+        item.hidden = !match;
+
+        if (match) {
+            visible++;
+        }
+    });
+
+    $("#faqEmpty").hidden = visible > 0;
+}
+
+$$("[data-help]").forEach(link => {
+    link.addEventListener("click", event => {
+        event.preventDefault();
+        openHelp(link.dataset.help);
+    });
+});
+
+$$(".help-tab").forEach(button => {
+    button.addEventListener("click", () => showHelpTab(button.dataset.helpTab));
+});
+
+helpClose.addEventListener("click", closeHelp);
+helpOverlay.addEventListener("click", closeHelp);
+
+$("#contactForm").addEventListener("submit", event => {
+    event.preventDefault();
+    submitContact();
+});
+
+$("#returnForm").addEventListener("submit", event => {
+    event.preventDefault();
+    submitReturn();
+});
+
+$("#returnOrder").addEventListener("change", fillReturnItems);
+
+$("#returnLoginBtn").addEventListener("click", () => {
+    closeHelp();
+    openLogin(false);
+});
+
+$("#shipCheck").addEventListener("click", checkDelivery);
+$("#trackCheck").addEventListener("click", trackOrderById);
+
+$("#shipPin").addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        checkDelivery();
+    }
+});
+
+$("#shipPin").addEventListener("input", event => {
+    event.target.value = event.target.value.replace(/\D/g, "");
+});
+
+$("#trackId").addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        trackOrderById();
+    }
+});
+
+$("#faqSearch").addEventListener("input", filterFaq);
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        closeHelp();
+    }
+});
