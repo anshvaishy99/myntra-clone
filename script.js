@@ -57,10 +57,32 @@ const mobileBagCount = document.getElementById("mobileBagCount");
 const mobileMenuBtn = document.getElementById("mobileMenuBtn");
 const mobileMenu = document.getElementById("mobileMenu");
 
+const checkoutOverlay = document.getElementById("checkoutOverlay");
+const checkoutPanel = document.getElementById("checkoutPanel");
+const checkoutClose = document.getElementById("checkoutClose");
+const checkoutForm = document.getElementById("checkoutForm");
+const checkoutItems = document.getElementById("checkoutItems");
+const checkoutItemCount = document.getElementById("checkoutItemCount");
+const checkoutSubtotal = document.getElementById("checkoutSubtotal");
+const checkoutDiscount = document.getElementById("checkoutDiscount");
+const checkoutDelivery = document.getElementById("checkoutDelivery");
+const checkoutTotal = document.getElementById("checkoutTotal");
+const couponInput = document.getElementById("couponInput");
+const applyCoupon = document.getElementById("applyCoupon");
+const couponMessage = document.getElementById("couponMessage");
+const placeOrderBtn = document.getElementById("placeOrderBtn");
+const orderSuccess = document.getElementById("orderSuccess");
+const orderId = document.getElementById("orderId");
+const successPayment = document.getElementById("successPayment");
+const continueAfterOrder = document.getElementById("continueAfterOrder");
+
 let wishlist = JSON.parse(localStorage.getItem("myntraWishlist")) || [];
 let bag = JSON.parse(localStorage.getItem("myntraBag")) || [];
 let modalProduct = null;
 let modalSelectedSize = "";
+let toastTimer;
+let appliedCoupon = "";
+let couponDiscount = 0;
 
 const filters = {
     category: "all",
@@ -68,8 +90,6 @@ const filters = {
     rating: "all",
     discount: "all"
 };
-
-let toastTimer;
 
 function formatPrice(price) {
     return `₹${Number(price).toLocaleString("en-IN")}`;
@@ -116,7 +136,8 @@ function getProductByName(name) {
 }
 
 function getProductData(product) {
-    const sizes = [...product.querySelectorAll(".size-row button")].map(button => button.textContent.trim());
+    const sizes = [...product.querySelectorAll(".size-row button")]
+        .map(button => button.textContent.trim());
 
     return {
         name: product.dataset.name,
@@ -140,7 +161,8 @@ function closeWishlist() {
 
     if (
         !cartDrawer.classList.contains("open") &&
-        !quickModal.classList.contains("show")
+        !quickModal.classList.contains("show") &&
+        !checkoutPanel.classList.contains("open")
     ) {
         document.body.style.overflow = "";
     }
@@ -237,6 +259,7 @@ function renderWishlist() {
     wishlistBody.querySelectorAll(".wishlist-remove").forEach(button => {
         button.addEventListener("click", () => {
             const index = Number(button.dataset.index);
+
             wishlist.splice(index, 1);
 
             saveData();
@@ -251,16 +274,16 @@ function renderWishlist() {
     wishlistBody.querySelectorAll(".wishlist-add").forEach(button => {
         button.addEventListener("click", () => {
             const index = Number(button.dataset.index);
-            const item = wishlist[index];
-            const sizeRow = button.parentElement.querySelector(".wishlist-size-row");
-            const selected = sizeRow.querySelector(".selected");
+            const name = wishlist[index];
+            const selected = button.parentElement
+                .querySelector(".wishlist-size-row .selected");
 
             if (!selected) {
                 showToast("Please select a size");
                 return;
             }
 
-            const product = getProductByName(item);
+            const product = getProductByName(name);
 
             if (!product) {
                 showToast("Product unavailable");
@@ -268,6 +291,8 @@ function renderWishlist() {
             }
 
             const data = getProductData(product);
+
+            closeWishlist();
 
             addToBag({
                 name: data.name,
@@ -277,8 +302,6 @@ function renderWishlist() {
                 size: selected.dataset.size,
                 quantity: 1
             });
-
-            closeWishlist();
         });
     });
 }
@@ -303,6 +326,7 @@ function toggleWishlist(name) {
 
 function updateBagCount() {
     const total = bag.reduce((sum, item) => sum + item.quantity, 0);
+
     bagCount.textContent = total;
     mobileBagCount.textContent = total;
 }
@@ -413,11 +437,13 @@ function renderCart() {
     cartBody.querySelectorAll(".cart-remove").forEach(button => {
         button.addEventListener("click", () => {
             const index = Number(button.dataset.index);
+
             bag.splice(index, 1);
 
             saveData();
             updateBagCount();
             renderCart();
+
             showToast("Removed from bag");
         });
     });
@@ -446,7 +472,8 @@ function closeCart() {
 
     if (
         !wishlistDrawer.classList.contains("open") &&
-        !quickModal.classList.contains("show")
+        !quickModal.classList.contains("show") &&
+        !checkoutPanel.classList.contains("open")
     ) {
         document.body.style.overflow = "";
     }
@@ -493,7 +520,8 @@ function closeQuickView() {
 
     if (
         !cartDrawer.classList.contains("open") &&
-        !wishlistDrawer.classList.contains("open")
+        !wishlistDrawer.classList.contains("open") &&
+        !checkoutPanel.classList.contains("open")
     ) {
         document.body.style.overflow = "";
     }
@@ -653,12 +681,235 @@ function updateActiveFilters() {
     });
 }
 
+function getCartSubtotal() {
+    return bag.reduce(
+        (sum, item) =>
+            sum + Number(item.price) * Number(item.quantity),
+        0
+    );
+}
+
+function getDeliveryCharge(subtotal) {
+    return subtotal === 0 || subtotal >= 999 ? 0 : 99;
+}
+
+function renderCheckout() {
+    const subtotal = getCartSubtotal();
+    const delivery = getDeliveryCharge(subtotal);
+    const itemCount = bag.reduce(
+        (sum, item) => sum + Number(item.quantity),
+        0
+    );
+
+    checkoutItemCount.textContent =
+        `${itemCount} item${itemCount === 1 ? "" : "s"}`;
+
+    if (!bag.length) {
+        checkoutItems.innerHTML = `
+            <div class="cart-empty">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <h3>Your bag is empty</h3>
+                <p>Add products before checkout.</p>
+            </div>
+        `;
+    } else {
+        checkoutItems.innerHTML = bag.map(item => `
+            <div class="checkout-item">
+                <div class="checkout-item-image">
+                    <img src="${item.image}" alt="${item.name}">
+                </div>
+
+                <div>
+                    <div class="checkout-item-brand">${item.brand}</div>
+                    <div class="checkout-item-name">${item.name}</div>
+                    <div class="checkout-item-meta">
+                        Size: ${item.size} · Qty: ${item.quantity}
+                    </div>
+                </div>
+
+                <div class="checkout-item-price">
+                    ${formatPrice(item.price * item.quantity)}
+                </div>
+            </div>
+        `).join("");
+    }
+
+    checkoutSubtotal.textContent = formatPrice(subtotal);
+    checkoutDiscount.textContent =
+        `− ${formatPrice(couponDiscount)}`;
+
+    checkoutDelivery.textContent =
+        delivery === 0 ? "FREE" : formatPrice(delivery);
+
+    const total = Math.max(
+        0,
+        subtotal - couponDiscount + delivery
+    );
+
+    checkoutTotal.textContent = formatPrice(total);
+}
+
+function resetCheckout() {
+    checkoutForm.reset();
+
+    document.querySelectorAll(".payment-option").forEach(option => {
+        option.classList.toggle(
+            "active",
+            option.querySelector("input").checked
+        );
+    });
+
+    appliedCoupon = "";
+    couponDiscount = 0;
+
+    couponInput.value = "";
+    couponMessage.textContent = "";
+    couponMessage.className = "coupon-message";
+}
+
+function openCheckout() {
+    if (!bag.length) {
+        showToast("Your bag is empty");
+        return;
+    }
+
+    closeCart();
+    closeWishlist();
+
+    checkoutPanel.classList.remove("success-mode");
+    orderSuccess.classList.remove("show");
+
+    resetCheckout();
+    renderCheckout();
+
+    checkoutOverlay.classList.add("show");
+    checkoutPanel.classList.add("open");
+
+    document.body.style.overflow = "hidden";
+}
+
+function closeCheckout() {
+    checkoutOverlay.classList.remove("show");
+    checkoutPanel.classList.remove("open", "success-mode");
+    orderSuccess.classList.remove("show");
+
+    if (
+        !cartDrawer.classList.contains("open") &&
+        !wishlistDrawer.classList.contains("open") &&
+        !quickModal.classList.contains("show")
+    ) {
+        document.body.style.overflow = "";
+    }
+}
+
+function applyCouponCode() {
+    const code = couponInput.value.trim().toUpperCase();
+    const subtotal = getCartSubtotal();
+
+    if (!code) {
+        couponMessage.textContent = "Enter a coupon code.";
+        couponMessage.className = "coupon-message error";
+        return;
+    }
+
+    if (code === "MYNTRA20") {
+        appliedCoupon = code;
+        couponDiscount = Math.round(subtotal * 0.20);
+
+        couponMessage.textContent =
+            "20% discount applied successfully.";
+
+        couponMessage.className =
+            "coupon-message success";
+    } else if (code === "STYLE10") {
+        appliedCoupon = code;
+        couponDiscount = Math.round(subtotal * 0.10);
+
+        couponMessage.textContent =
+            "10% discount applied successfully.";
+
+        couponMessage.className =
+            "coupon-message success";
+    } else {
+        appliedCoupon = "";
+        couponDiscount = 0;
+
+        couponMessage.textContent =
+            "Invalid coupon. Try MYNTRA20 or STYLE10.";
+
+        couponMessage.className =
+            "coupon-message error";
+    }
+
+    renderCheckout();
+}
+
+function validateCheckout() {
+    const name = document.getElementById("customerName").value.trim();
+    const phone = document.getElementById("customerPhone").value.trim();
+    const address = document.getElementById("customerAddress").value.trim();
+    const city = document.getElementById("customerCity").value.trim();
+    const pincode = document.getElementById("customerPincode").value.trim();
+
+    if (!name || !phone || !address || !city || !pincode) {
+        showToast("Please complete your delivery details");
+        return false;
+    }
+
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+        showToast("Enter a valid 10-digit mobile number");
+        return false;
+    }
+
+    if (!/^\d{6}$/.test(pincode)) {
+        showToast("Enter a valid 6-digit pincode");
+        return false;
+    }
+
+    return true;
+}
+
+function placeOrder() {
+    if (!validateCheckout()) {
+        return;
+    }
+
+    if (!bag.length) {
+        showToast("Your bag is empty");
+        closeCheckout();
+        return;
+    }
+
+    const payment = document.querySelector(
+        'input[name="paymentMethod"]:checked'
+    );
+
+    const generatedId =
+        "MYNTRA-" + String(Date.now()).slice(-6);
+
+    orderId.textContent = generatedId;
+    successPayment.textContent =
+        payment ? payment.value : "UPI";
+
+    bag = [];
+
+    saveData();
+    updateBagCount();
+    renderCart();
+
+    checkoutPanel.classList.add("success-mode");
+    orderSuccess.classList.add("show");
+
+    showToast("Order placed successfully");
+}
+
 document.querySelectorAll(".wishlist-product").forEach(button => {
     button.addEventListener("click", event => {
         event.preventDefault();
         event.stopPropagation();
 
         const product = button.closest(".product-card");
+
         toggleWishlist(product.dataset.name);
     });
 });
@@ -677,20 +928,26 @@ document.querySelectorAll(".size-row button").forEach(button => {
 
 document.querySelectorAll(".qty-minus").forEach(button => {
     button.addEventListener("click", () => {
-        const value = button.parentElement.querySelector(".qty-value");
+        const value =
+            button.parentElement.querySelector(".qty-value");
+
         let quantity = Number(value.textContent);
 
         quantity = Math.max(1, quantity - 1);
+
         value.textContent = quantity;
     });
 });
 
 document.querySelectorAll(".qty-plus").forEach(button => {
     button.addEventListener("click", () => {
-        const value = button.parentElement.querySelector(".qty-value");
+        const value =
+            button.parentElement.querySelector(".qty-value");
+
         let quantity = Number(value.textContent);
 
         quantity = Math.min(10, quantity + 1);
+
         value.textContent = quantity;
     });
 });
@@ -698,7 +955,9 @@ document.querySelectorAll(".qty-plus").forEach(button => {
 document.querySelectorAll(".add-bag").forEach(button => {
     button.addEventListener("click", () => {
         const product = button.closest(".product-card");
-        const selectedSize = product.querySelector(".size-row .selected");
+        const selectedSize =
+            product.querySelector(".size-row .selected");
+
         const quantity = Number(
             product.querySelector(".qty-value").textContent
         );
@@ -732,13 +991,17 @@ document.querySelectorAll(".quick-view").forEach(button => {
 
 modalMinus.addEventListener("click", () => {
     let quantity = Number(modalQty.textContent);
+
     quantity = Math.max(1, quantity - 1);
+
     modalQty.textContent = quantity;
 });
 
 modalPlus.addEventListener("click", () => {
     let quantity = Number(modalQty.textContent);
+
     quantity = Math.min(10, quantity + 1);
+
     modalQty.textContent = quantity;
 });
 
@@ -773,19 +1036,15 @@ quickModal.addEventListener("click", event => {
 });
 
 wishlistBtn.addEventListener("click", openWishlist);
-
 mobileWishlistBtn.addEventListener("click", openWishlist);
 
 wishlistClose.addEventListener("click", closeWishlist);
-
 wishlistOverlay.addEventListener("click", closeWishlist);
 
 bagBtn.addEventListener("click", openCart);
-
 mobileBagBtn.addEventListener("click", openCart);
 
 cartClose.addEventListener("click", closeCart);
-
 cartOverlay.addEventListener("click", closeCart);
 
 profileBtn.addEventListener("click", () => {
@@ -832,6 +1091,7 @@ document.querySelectorAll(".filter-option").forEach(button => {
         const value = button.dataset.value;
 
         filters[type] = value;
+
         applyFilters();
     });
 });
@@ -852,11 +1112,51 @@ function resetAllFilters() {
 resetFilters.addEventListener("click", resetAllFilters);
 noResultsReset.addEventListener("click", resetAllFilters);
 
+document.querySelector(".checkout-btn").addEventListener(
+    "click",
+    openCheckout
+);
+
+checkoutClose.addEventListener("click", closeCheckout);
+checkoutOverlay.addEventListener("click", closeCheckout);
+
+applyCoupon.addEventListener("click", applyCouponCode);
+
+couponInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        applyCouponCode();
+    }
+});
+
+document.querySelectorAll(".payment-option").forEach(option => {
+    option.addEventListener("click", () => {
+        document.querySelectorAll(".payment-option").forEach(item => {
+            item.classList.remove("active");
+        });
+
+        option.classList.add("active");
+        option.querySelector("input").checked = true;
+    });
+});
+
+placeOrderBtn.addEventListener("click", placeOrder);
+
+continueAfterOrder.addEventListener("click", () => {
+    closeCheckout();
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+});
+
 document.addEventListener("keydown", event => {
     if (event.key === "Escape") {
         closeQuickView();
         closeCart();
         closeWishlist();
+        closeCheckout();
         mobileMenu.classList.remove("show");
     }
 });
@@ -881,7 +1181,9 @@ document.querySelectorAll(".reveal").forEach(element => {
 
 window.addEventListener("load", () => {
     setTimeout(() => {
-        document.getElementById("pageLoader").classList.add("hide");
+        document
+            .getElementById("pageLoader")
+            .classList.add("hide");
     }, 700);
 
     updateWishlistCount();
